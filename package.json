@@ -32,5 +32,10 @@
     "eslint-config-next": "^14.0.4",
     "prisma": "^5.7.1",
     "@types/bcrypt": "^5.0.2"
+  },
+  "overrides": {
+    "are-we-there-yet": "^3.0.1",
+    "gauge": "^4.0.4",
+    "npmlog": "^7.0.1"
   }
 } 
