@@ -31,4 +31,15 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts 
+next-env.d.ts
+
+# OS files
+Thumbs.db
+desktop.ini
+
+# specific files we don't need in git
+vercel.html
+index.html
+calendar.html
+social.html
+scripts.js 

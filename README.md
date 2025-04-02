@@ -1,38 +1,70 @@
-# EFIS PODCAST - Panel de Control
+# EFIS Podcast - Panel de Control
 
-Panel de administración para EFIS Podcast, una plataforma dedicada a contenido sobre finanzas, emprendimiento y crecimiento personal enfocado en jóvenes.
+Un panel de control interactivo para gestionar el calendario de contenido y las publicaciones en redes sociales del podcast EFIS.
 
-## Características principales
+## Características
 
-- **Dashboard centralizado**: Visualiza estadísticas y accesos rápidos a todas las funcionalidades.
-- **Calendario de contenido**: Planificación detallada de grabaciones y publicaciones.
-- **Publicación en redes sociales**: Programación y gestión de contenido para múltiples plataformas.
-- **Enlaces tipo Linktree**: Gestiona los enlaces a diferentes plataformas desde un solo lugar.
-- **Métricas y análisis**: Seguimiento del rendimiento de tus publicaciones.
+- **Autenticación**: Sistema de inicio de sesión seguro.
+- **Calendario de Contenido**: Programa y gestiona todos los eventos del podcast.
+- **Integración con Redes Sociales**: Administra las publicaciones en diversas plataformas.
+- **Estadísticas**: Visualiza métricas y analíticas de rendimiento.
+- **Base de Datos**: Almacenamiento persistente de todos los datos con PostgreSQL.
 
-## Plataformas soportadas
+## Requisitos
 
-- Instagram (Reels, historias)
-- TikTok
-- YouTube (Shorts y podcast completo)
-- LinkedIn
-- Spotify
+- Node.js 18.0 o superior
+- PostgreSQL (local o en la nube)
+- Cuenta en Vercel para despliegue
 
-## Estructura de publicación semanal
+## Configuración para Desarrollo
 
-- **Lunes**: Grabación y publicación de reels
-- **Martes**: Grabación de podcast y publicación de teaser
-- **Miércoles**: Grabación y publicación de reels
-- **Jueves**: Grabación y publicación de reels
-- **Viernes**: Grabación de teaser y publicación de podcast completo
+1. Clona el repositorio
+   ```
+   git clone https://github.com/tu-usuario/efis-podcast-panel.git
+   cd efis-podcast-panel
+   ```
 
-## Tecnologías utilizadas
+2. Instala las dependencias
+   ```
+   npm install
+   ```
 
-- Next.js
-- TypeScript
-- Tailwind CSS
-- Vercel (despliegue)
+3. Crea un archivo `.env.local` con las siguientes variables:
+   ```
+   DATABASE_URL=postgresql://usuario:password@localhost:5432/efis_podcast
+   NEXTAUTH_SECRET=tu-secreto-seguro
+   NEXTAUTH_URL=http://localhost:3000
+   ```
 
----
+4. Configura la base de datos
+   ```
+   npx prisma migrate dev
+   ```
 
-Desarrollado para gestionar el ecosistema de EFIS PODCAST bajo el lema "Tu dinero, tus reglas."
+5. Inicia el servidor de desarrollo
+   ```
+   npm run dev
+   ```
+
+## Despliegue en Vercel
+
+1. Crea una cuenta en Vercel y conecta tu repositorio.
+2. Configura las variables de entorno en la sección de "Environment Variables":
+   - `DATABASE_URL`: URL de conexión a tu base de datos PostgreSQL.
+   - `NEXTAUTH_SECRET`: Clave secreta para la autenticación.
+   - `NEXTAUTH_URL`: URL completa de la aplicación desplegada.
+3. Despliega la aplicación.
+
+## Tecnologías Utilizadas
+
+- **Next.js**: Framework de React para aplicaciones web.
+- **Prisma**: ORM para interactuar con la base de datos.
+- **NextAuth.js**: Sistema de autenticación.
+- **TailwindCSS**: Framework CSS para el diseño.
+- **PostgreSQL**: Base de datos relacional.
+- **TypeScript**: Tipado estático para JavaScript.
+- **React**: Biblioteca JavaScript para interfaces de usuario.
+
+## Licencia
+
+Este proyecto está bajo la Licencia MIT.
