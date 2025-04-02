@@ -30,13 +30,13 @@
       <nav>
         <ul>
           <li class="mb-2">
-            <a href="#" class="flex items-center p-2 rounded-md hover:bg-gray-800 bg-gray-800">
+            <a href="index.html" class="flex items-center p-2 rounded-md hover:bg-gray-800 bg-gray-800">
               <span class="mr-3 text-xl">📊</span>
               <span>Dashboard</span>
             </a>
           </li>
           <li class="mb-2">
-            <a href="#" class="flex items-center p-2 rounded-md hover:bg-gray-800">
+            <a href="calendar.html" class="flex items-center p-2 rounded-md hover:bg-gray-800">
               <span class="mr-3 text-xl">📅</span>
               <span>Calendario</span>
             </a>
@@ -48,7 +48,7 @@
             </a>
           </li>
           <li class="mb-2">
-            <a href="#" class="flex items-center p-2 rounded-md hover:bg-gray-800">
+            <a href="social.html" class="flex items-center p-2 rounded-md hover:bg-gray-800">
               <span class="mr-3 text-xl">🌐</span>
               <span>Redes Sociales</span>
             </a>
@@ -140,12 +140,12 @@
           <div class="bg-white rounded-lg shadow-md p-6 lg:col-span-2">
             <h2 class="text-xl font-semibold mb-4">Calendario de Contenido</h2>
             <div class="flex justify-between items-center mb-4">
-              <h3 class="font-medium">Semana del 3 al 7 de Abril, 2023</h3>
+              <h3 class="font-medium" id="week-title">Semana del 3 al 7 de Abril, 2023</h3>
               <div>
-                <button class="px-4 py-2 rounded-md bg-gray-200 text-gray-800 mr-2 hover:bg-gray-300">
+                <button id="prev-week" class="px-4 py-2 rounded-md bg-gray-200 text-gray-800 mr-2 hover:bg-gray-300">
                   Anterior
                 </button>
-                <button class="px-4 py-2 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">
+                <button id="next-week" class="px-4 py-2 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">
                   Siguiente
                 </button>
               </div>
@@ -166,31 +166,8 @@
                 <span class="text-xs font-normal text-gray-500">11:00 AM</span>
               </div>
               
-              <div class="border border-gray-200 p-2 min-h-24">
-                <div class="text-xs p-2 mb-1 rounded bg-green-100">
-                  Grabación Reel: Cómo ahorrar dinero
-                </div>
-              </div>
-              <div class="border border-gray-200 p-2 min-h-24">
-                <div class="text-xs p-2 mb-1 rounded bg-blue-100">
-                  Grabación Podcast: Finanzas para Jóvenes
-                </div>
-              </div>
-              <div class="border border-gray-200 p-2 min-h-24">
-                <div class="text-xs p-2 mb-1 rounded bg-green-100">
-                  Grabación Reel: Emprendimiento exitoso
-                </div>
-              </div>
-              <div class="border border-gray-200 p-2 min-h-24">
-                <div class="text-xs p-2 mb-1 rounded bg-green-100">
-                  Grabación Reel: Hábitos financieros
-                </div>
-              </div>
-              <div class="border border-gray-200 p-2 min-h-24">
-                <div class="text-xs p-2 mb-1 rounded bg-yellow-100">
-                  Grabación Teaser: Podcast próximo
-                </div>
-              </div>
+              <!-- Contenedor para las celdas de grabación -->
+              <div id="recording-container" class="contents"></div>
               
               <!-- Publicación -->
               <div class="bg-gray-100 p-3 font-semibold">
@@ -198,36 +175,8 @@
                 <span class="text-xs font-normal text-gray-500">20:00 PM</span>
               </div>
               
-              <div class="border border-gray-200 p-2 min-h-24">
-                <div class="text-xs p-2 mb-1 rounded bg-green-100">
-                  Publicación Reel: 5 consejos para invertir
-                  <div class="text-gray-500 mt-1">Instagram, TikTok</div>
-                </div>
-              </div>
-              <div class="border border-gray-200 p-2 min-h-24">
-                <div class="text-xs p-2 mb-1 rounded bg-yellow-100">
-                  Publicación Teaser: Podcast de la semana
-                  <div class="text-gray-500 mt-1">Instagram, TikTok</div>
-                </div>
-              </div>
-              <div class="border border-gray-200 p-2 min-h-24">
-                <div class="text-xs p-2 mb-1 rounded bg-green-100">
-                  Publicación Reel: Finanzas personales
-                  <div class="text-gray-500 mt-1">Instagram, TikTok</div>
-                </div>
-              </div>
-              <div class="border border-gray-200 p-2 min-h-24">
-                <div class="text-xs p-2 mb-1 rounded bg-green-100">
-                  Publicación Reel: Errores financieros
-                  <div class="text-gray-500 mt-1">Instagram, TikTok</div>
-                </div>
-              </div>
-              <div class="border border-gray-200 p-2 min-h-24">
-                <div class="text-xs p-2 mb-1 rounded bg-blue-100">
-                  Publicación Podcast: Finanzas para Jóvenes
-                  <div class="text-gray-500 mt-1">Spotify, YouTube</div>
-                </div>
-              </div>
+              <!-- Contenedor para las celdas de publicación -->
+              <div id="publishing-container" class="contents"></div>
             </div>
             
             <!-- Leyenda -->
@@ -245,10 +194,138 @@
                 <span>Teaser</span>
               </div>
             </div>
+            
+            <div class="mt-4 flex justify-center">
+              <button onclick="openEventModal(new Date().toISOString().split('T')[0], '11:00')" 
+                      class="px-4 py-2 bg-efis-blue text-white rounded-md hover:bg-blue-800 flex items-center">
+                <span class="mr-2">+</span> Añadir nuevo evento
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+  
+  <!-- Modal para crear/editar eventos -->
+  <div id="event-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <div class="flex justify-between items-center mb-4">
+        <h3 id="modal-title" class="text-xl font-semibold">Nuevo Evento</h3>
+        <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <form id="event-form">
+        <div class="mb-4">
+          <label for="event-title" class="block text-sm font-medium text-gray-700 mb-1">
+            Título <span class="text-red-500">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="event-title" 
+            class="w-full p-2 border border-gray-300 rounded-md"
+            placeholder="Título del evento"
+            required
+          />
+        </div>
+        
+        <div class="mb-4">
+          <label for="event-type" class="block text-sm font-medium text-gray-700 mb-1">
+            Tipo <span class="text-red-500">*</span>
+          </label>
+          <select id="event-type" class="w-full p-2 border border-gray-300 rounded-md" required>
+            <option value="">Selecciona un tipo</option>
+            <option value="podcast">Podcast</option>
+            <option value="reel">Reel</option>
+            <option value="teaser">Teaser</option>
+            <option value="post">Post</option>
+          </select>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label for="event-date" class="block text-sm font-medium text-gray-700 mb-1">
+              Fecha
+            </label>
+            <input 
+              type="date" 
+              id="event-date" 
+              class="w-full p-2 border border-gray-300 rounded-md"
+              readonly
+            />
+          </div>
+          
+          <div>
+            <label for="event-time" class="block text-sm font-medium text-gray-700 mb-1">
+              Hora
+            </label>
+            <input 
+              type="time" 
+              id="event-time" 
+              class="w-full p-2 border border-gray-300 rounded-md"
+              readonly
+            />
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Plataformas
+          </label>
+          <div id="event-platforms" class="flex flex-wrap gap-2">
+            <label class="inline-flex items-center">
+              <input type="checkbox" value="Instagram" class="mr-2" />
+              Instagram
+            </label>
+            <label class="inline-flex items-center">
+              <input type="checkbox" value="TikTok" class="mr-2" />
+              TikTok
+            </label>
+            <label class="inline-flex items-center">
+              <input type="checkbox" value="YouTube" class="mr-2" />
+              YouTube
+            </label>
+            <label class="inline-flex items-center">
+              <input type="checkbox" value="Spotify" class="mr-2" />
+              Spotify
+            </label>
+            <label class="inline-flex items-center">
+              <input type="checkbox" value="LinkedIn" class="mr-2" />
+              LinkedIn
+            </label>
+          </div>
+        </div>
+        
+        <div class="flex justify-end space-x-2">
+          <button 
+            type="button" 
+            id="delete-event" 
+            class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 hidden"
+          >
+            Eliminar
+          </button>
+          <button 
+            type="button" 
+            onclick="closeEventModal()" 
+            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="px-4 py-2 bg-efis-blue text-white rounded-md hover:bg-blue-800"
+          >
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <script src="scripts.js"></script>
 </body>
 </html> 
