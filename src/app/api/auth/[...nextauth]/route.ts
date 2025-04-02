@@ -1,9 +1,10 @@
-import NextAuth, { AuthOptions, User } from "next-auth";
+import NextAuth, { AuthOptions, User, NextAuthOptions, Session, Account, Profile } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcrypt";
 import prisma from "@/lib/prisma";
+import { JWT } from "next-auth/jwt";
 
-const authOptions: AuthOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -11,7 +12,7 @@ const authOptions: AuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials) {
+      async authorize(credentials: Record<"email" | "password", string> | undefined) {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
@@ -48,14 +49,22 @@ const authOptions: AuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account, profile }: { 
+      token: JWT; 
+      user?: User | undefined; 
+      account?: Account | null; 
+      profile?: Profile | undefined; 
+    }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { 
+      session: Session; 
+      token: JWT; 
+    }) {
       if (token && session.user) {
         session.user.id = token.id;
         session.user.role = token.role;
