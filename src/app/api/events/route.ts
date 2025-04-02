@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import type { Session } from "next-auth";
 
 // GET /api/events
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession() as Session | null;
 
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest) {
 // POST /api/events
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession() as Session | null;
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
         time,
         platform,
         status: status || "scheduled",
-        userId: session.user.id as string,
+        userId: session.user.id,
       },
     });
 

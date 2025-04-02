@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import type { Session } from "next-auth";
 
 interface Params {
   params: {
@@ -11,7 +12,7 @@ interface Params {
 // GET /api/events/[id]
 export async function GET(request: NextRequest, { params }: Params) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession() as Session | null;
 
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest, { params }: Params) {
 // PUT /api/events/[id]
 export async function PUT(request: NextRequest, { params }: Params) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession() as Session | null;
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -73,7 +74,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
 // DELETE /api/events/[id]
 export async function DELETE(request: NextRequest, { params }: Params) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession() as Session | null;
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
