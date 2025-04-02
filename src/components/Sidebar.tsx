@@ -22,10 +22,10 @@ export default function Sidebar() {
         <ul>
           {menuItems.map((item) => (
             <li key={item.path} className="mb-2">
-              <Link href={item.path} className="flex items-center p-2 rounded-md hover:bg-gray-800 transition-all">
+              <a href={item.path} className="flex items-center p-2 rounded-md hover:bg-gray-800">
                 <span className="mr-3 text-xl">{item.icon}</span>
                 <span>{item.name}</span>
-              </Link>
+              </a>
             </li>
           ))}
         </ul>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EFIS Podcast | Calendario de Contenido</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'efis-blue': '#1E3A8A',
+            'efis-black': '#121212',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-efis-black text-white min-h-screen p-4">
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold text-white">EFIS PODCAST</h1>
+        <p class="text-gray-400 text-sm">Panel de Administración</p>
+      </div>
+      
+      <nav>
+        <ul>
+          <li class="mb-2">
+            <a href="index.html" class="flex items-center p-2 rounded-md hover:bg-gray-800">
+              <span class="mr-3 text-xl">📊</span>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="mb-2">
+            <a href="calendar.html" class="flex items-center p-2 rounded-md hover:bg-gray-800 bg-gray-800">
+              <span class="mr-3 text-xl">📅</span>
+              <span>Calendario</span>
+            </a>
+          </li>
+          <li class="mb-2">
+            <a href="#" class="flex items-center p-2 rounded-md hover:bg-gray-800">
+              <span class="mr-3 text-xl">📝</span>
+              <span>Publicaciones</span>
+            </a>
+          </li>
+          <li class="mb-2">
+            <a href="social.html" class="flex items-center p-2 rounded-md hover:bg-gray-800">
+              <span class="mr-3 text-xl">🌐</span>
+              <span>Redes Sociales</span>
+            </a>
+          </li>
+          <li class="mb-2">
+            <a href="#" class="flex items-center p-2 rounded-md hover:bg-gray-800">
+              <span class="mr-3 text-xl">📈</span>
+              <span>Estadísticas</span>
+            </a>
+          </li>
+          <li class="mb-2">
+            <a href="#" class="flex items-center p-2 rounded-md hover:bg-gray-800">
+              <span class="mr-3 text-xl">⚙️</span>
+              <span>Configuración</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      
+      <div class="mt-auto pt-6 border-t border-gray-700 mt-8">
+        <div class="flex items-center p-4 bg-gray-800 rounded-md">
+          <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-3">
+            EP
+          </div>
+          <div>
+            <p class="text-sm font-medium">Admin</p>
+            <p class="text-xs text-gray-400">efis@podcast.com</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 bg-gray-100">
+      <div class="p-10">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8">
+          Calendario de Contenido
+        </h1>
+        
+        <div class="grid grid-cols-1 gap-8">
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-6">Planificación Semanal</h2>
+            
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-medium">Semana del 3 al 7 de Abril, 2023</h3>
+              <div>
+                <button class="px-4 py-2 rounded-md bg-gray-200 text-gray-800 mr-2 hover:bg-gray-300">
+                  Anterior
+                </button>
+                <button class="px-4 py-2 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300">
+                  Siguiente
+                </button>
+              </div>
+            </div>
+            
+            <!-- Calendario Completo -->
+            <div class="grid grid-cols-6 gap-2">
+              <div class="bg-gray-100 p-3 font-semibold"></div>
+              <div class="bg-gray-100 p-3 font-semibold">Lunes</div>
+              <div class="bg-gray-100 p-3 font-semibold">Martes</div>
+              <div class="bg-gray-100 p-3 font-semibold">Miércoles</div>
+              <div class="bg-gray-100 p-3 font-semibold">Jueves</div>
+              <div class="bg-gray-100 p-3 font-semibold">Viernes</div>
+              
+              <!-- Grabación -->
+              <div class="bg-gray-100 p-3 font-semibold">
+                Grabación<br>
+                <span class="text-xs font-normal text-gray-500">11:00 AM</span>
+              </div>
+              
+              <div class="border border-gray-200 p-2 min-h-24">
+                <div class="text-xs p-2 mb-1 rounded bg-green-100">
+                  Grabación Reel: Cómo ahorrar dinero
+                </div>
+              </div>
+              <div class="border border-gray-200 p-2 min-h-24">
+                <div class="text-xs p-2 mb-1 rounded bg-blue-100">
+                  Grabación Podcast: Finanzas para Jóvenes
+                </div>
+              </div>
+              <div class="border border-gray-200 p-2 min-h-24">
+                <div class="text-xs p-2 mb-1 rounded bg-green-100">
+                  Grabación Reel: Emprendimiento exitoso
+                </div>
+              </div>
+              <div class="border border-gray-200 p-2 min-h-24">
+                <div class="text-xs p-2 mb-1 rounded bg-green-100">
+                  Grabación Reel: Hábitos financieros
+                </div>
+              </div>
+              <div class="border border-gray-200 p-2 min-h-24">
+                <div class="text-xs p-2 mb-1 rounded bg-yellow-100">
+                  Grabación Teaser: Podcast próximo
+                </div>
+              </div>
+              
+              <!-- Publicación -->
+              <div class="bg-gray-100 p-3 font-semibold">
+                Publicación<br>
+                <span class="text-xs font-normal text-gray-500">20:00 PM</span>
+              </div>
+              
+              <div class="border border-gray-200 p-2 min-h-24">
+                <div class="text-xs p-2 mb-1 rounded bg-green-100">
+                  Publicación Reel: 5 consejos para invertir
+                  <div class="text-gray-500 mt-1">Instagram, TikTok</div>
+                </div>
+              </div>
+              <div class="border border-gray-200 p-2 min-h-24">
+                <div class="text-xs p-2 mb-1 rounded bg-yellow-100">
+                  Publicación Teaser: Podcast de la semana
+                  <div class="text-gray-500 mt-1">Instagram, TikTok</div>
+                </div>
+              </div>
+              <div class="border border-gray-200 p-2 min-h-24">
+                <div class="text-xs p-2 mb-1 rounded bg-green-100">
+                  Publicación Reel: Finanzas personales
+                  <div class="text-gray-500 mt-1">Instagram, TikTok</div>
+                </div>
+              </div>
+              <div class="border border-gray-200 p-2 min-h-24">
+                <div class="text-xs p-2 mb-1 rounded bg-green-100">
+                  Publicación Reel: Errores financieros
+                  <div class="text-gray-500 mt-1">Instagram, TikTok</div>
+                </div>
+              </div>
+              <div class="border border-gray-200 p-2 min-h-24">
+                <div class="text-xs p-2 mb-1 rounded bg-blue-100">
+                  Publicación Podcast: Finanzas para Jóvenes
+                  <div class="text-gray-500 mt-1">Spotify, YouTube</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Leyenda -->
+            <div class="flex mt-6 text-sm">
+              <div class="flex items-center mr-4">
+                <div class="w-3 h-3 rounded-full bg-blue-100 mr-1"></div>
+                <span>Podcast</span>
+              </div>
+              <div class="flex items-center mr-4">
+                <div class="w-3 h-3 rounded-full bg-green-100 mr-1"></div>
+                <span>Reel</span>
+              </div>
+              <div class="flex items-center mr-4">
+                <div class="w-3 h-3 rounded-full bg-yellow-100 mr-1"></div>
+                <span>Teaser</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg shadow-md p-6">
+              <h2 class="text-xl font-semibold mb-4">Plan de Grabación</h2>
+              <div class="border-l-4 border-blue-500 pl-4 mb-4">
+                <h3 class="font-medium">Lunes</h3>
+                <p class="text-gray-600">Grabación de 1 reel (11:00 AM)</p>
+              </div>
+              <div class="border-l-4 border-blue-500 pl-4 mb-4">
+                <h3 class="font-medium">Martes</h3>
+                <p class="text-gray-600">Grabación del podcast completo (11:00 AM)</p>
+              </div>
+              <div class="border-l-4 border-blue-500 pl-4 mb-4">
+                <h3 class="font-medium">Miércoles</h3>
+                <p class="text-gray-600">Grabación de 1 reel (11:00 AM)</p>
+              </div>
+              <div class="border-l-4 border-blue-500 pl-4 mb-4">
+                <h3 class="font-medium">Jueves</h3>
+                <p class="text-gray-600">Grabación de 1 reel (11:00 AM)</p>
+              </div>
+              <div class="border-l-4 border-blue-500 pl-4">
+                <h3 class="font-medium">Viernes</h3>
+                <p class="text-gray-600">Grabación de teaser del podcast (11:00 AM)</p>
+              </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+              <h2 class="text-xl font-semibold mb-4">Plan de Publicación</h2>
+              <div class="border-l-4 border-green-500 pl-4 mb-4">
+                <h3 class="font-medium">Lunes</h3>
+                <p class="text-gray-600">Publicación de un reel editado (20:00 PM)</p>
+              </div>
+              <div class="border-l-4 border-green-500 pl-4 mb-4">
+                <h3 class="font-medium">Martes</h3>
+                <p class="text-gray-600">Publicación del teaser del podcast (20:00 PM)</p>
+              </div>
+              <div class="border-l-4 border-green-500 pl-4 mb-4">
+                <h3 class="font-medium">Miércoles</h3>
+                <p class="text-gray-600">Publicación de un reel editado (20:00 PM)</p>
+              </div>
+              <div class="border-l-4 border-green-500 pl-4 mb-4">
+                <h3 class="font-medium">Jueves</h3>
+                <p class="text-gray-600">Publicación de un reel editado (20:00 PM)</p>
+              </div>
+              <div class="border-l-4 border-green-500 pl-4">
+                <h3 class="font-medium">Viernes</h3>
+                <p class="text-gray-600">Publicación del podcast completo (20:00 PM)</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4">Añadir Nuevo Evento</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Título
+                </label>
+                <input 
+                  type="text" 
+                  class="w-full p-2 border border-gray-300 rounded-md"
+                  placeholder="Título del evento"
+                />
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Tipo
+                </label>
+                <select class="w-full p-2 border border-gray-300 rounded-md">
+                  <option value="">Selecciona un tipo</option>
+                  <option value="reel">Reel</option>
+                  <option value="podcast">Podcast</option>
+                  <option value="teaser">Teaser</option>
+                  <option value="post">Post</option>
+                </select>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Fecha
+                </label>
+                <input 
+                  type="date" 
+                  class="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Hora
+                </label>
+                <input 
+                  type="time" 
+                  class="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
+              
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Plataformas
+                </label>
+                <div class="flex flex-wrap gap-4">
+                  <label class="inline-flex items-center">
+                    <input type="checkbox" class="mr-2">
+                    Instagram
+                  </label>
+                  <label class="inline-flex items-center">
+                    <input type="checkbox" class="mr-2">
+                    TikTok
+                  </label>
+                  <label class="inline-flex items-center">
+                    <input type="checkbox" class="mr-2">
+                    YouTube
+                  </label>
+                  <label class="inline-flex items-center">
+                    <input type="checkbox" class="mr-2">
+                    Spotify
+                  </label>
+                  <label class="inline-flex items-center">
+                    <input type="checkbox" class="mr-2">
+                    LinkedIn
+                  </label>
+                </div>
+              </div>
+              
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Descripción
+                </label>
+                <textarea 
+                  class="w-full p-2 border border-gray-300 rounded-md h-24"
+                  placeholder="Descripción del evento"
+                ></textarea>
+              </div>
+              
+              <div class="md:col-span-2 flex justify-end">
+                <button class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md mr-2 hover:bg-gray-300">
+                  Cancelar
+                </button>
+                <button class="px-4 py-2 bg-efis-blue text-white rounded-md hover:bg-blue-800">
+                  Añadir Evento
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html> 

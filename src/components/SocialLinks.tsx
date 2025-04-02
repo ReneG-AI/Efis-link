@@ -1,21 +1,13 @@
 import React from 'react';
 
-type SocialLink = {
-  id: number;
-  platform: string;
-  url: string;
-  icon: string;
-  color: string;
-};
-
 export default function SocialLinks() {
-  const socialLinks: SocialLink[] = [
+  const socialLinks = [
     {
       id: 1,
       platform: 'Instagram',
       url: 'https://instagram.com/efispodcast',
       icon: '📸',
-      color: 'bg-gradient-to-r from-purple-500 to-pink-500',
+      color: 'bg-purple-500',
     },
     {
       id: 2,
@@ -53,9 +45,7 @@ export default function SocialLinks() {
         <a
           key={link.id}
           href={link.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`flex items-center p-3 rounded-md text-white ${link.color} hover:opacity-90 transition-all`}
+          className={`flex items-center p-3 rounded-md text-white ${link.color}`}
         >
           <span className="text-xl mr-3">{link.icon}</span>
           <span className="font-medium">{link.platform}</span>
