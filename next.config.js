@@ -1,9 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
+  swcMinify: true,
+  output: 'export',
+  trailingSlash: true,
+  assetPrefix: './',
   images: {
-    domains: ['images.unsplash.com', 'res.cloudinary.com'],
+    unoptimized: true,
   },
-}
+};
 
-module.exports = nextConfig 
+module.exports = nextConfig; 
