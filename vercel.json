@@ -1,17 +1,10 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
+  "buildCommand": "npx next build",
   "installCommand": "npm install",
   "framework": "nextjs",
   "outputDirectory": ".next",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ],
   "env": {
-    "DATABASE_URL": "postgresql://neondb_owner:npg_zN5rHdZ4iQGF@ep-delicate-salad-a2t3cvw3-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require",
-    "NEXTAUTH_SECRET": "efis-podcast-production-secret-key",
-    "NEXTAUTH_URL": "https://efis-link.vercel.app",
-    "VERCEL_ENV": "production",
     "NEXT_SKIP_TYPECHECK": "true",
     "TYPESCRIPT_SKIP_TYPECHECK": "true"
   }
