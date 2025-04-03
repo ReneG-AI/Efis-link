@@ -1,12 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   swcMinify: true,
   eslint: {
     ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    // !! WARN !!
+    // Ignorar errores de tipo durante la compilación
+    // !! WARN !!
+    ignoreBuildErrors: process.env.SKIP_TYPE_CHECK === 'true',
   },
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client'],
