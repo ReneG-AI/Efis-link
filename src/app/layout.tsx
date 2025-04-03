@@ -1,13 +1,14 @@
-import React from 'react';
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
+import { Inter } from 'next/font/google';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
   title: 'EFIS Podcast Panel',
-  description: 'Panel de control para gestionar el contenido de Efis Podcast',
+  description: 'Panel de control para gestionar el contenido de EFIS Podcast',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({

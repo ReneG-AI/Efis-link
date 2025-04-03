@@ -1,21 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { format, addDays, subDays, startOfWeek, endOfWeek, isWithinInterval, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale';
-
-type ContentEvent = {
-  id: string;
-  title: string;
-  type: 'podcast' | 'reel' | 'teaser' | 'post';
-  date: Date | string;
-  time: string;
-  platform: string;
-  status: 'scheduled' | 'in-progress' | 'completed';
-  userId?: string;
-};
-
-const ContentCalendar = () => {
+// Componente simplificado de calendario sin dependencias externas
+export default function ContentCalendar() {
   // Días de la semana
   const weekDays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
   
@@ -45,37 +31,61 @@ const ContentCalendar = () => {
     ]
   };
 
+  const formatDate = () => {
+    const now = new Date();
+    return now.toLocaleDateString('es-ES', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   return (
-    <div className="overflow-x-auto">
-      <div className="grid grid-cols-7 gap-4 min-w-[800px]">
-        {weekDays.map((day) => (
-          <div key={day} className="flex flex-col">
-            <div className="bg-gray-100 p-2 text-center font-medium rounded-t-lg">
-              {day}
-            </div>
-            <div className="bg-white border border-gray-200 rounded-b-lg p-2 h-64 overflow-y-auto">
-              {weekEvents[day].length > 0 ? (
-                weekEvents[day].map((event, index) => (
-                  <div 
-                    key={index}
-                    className="bg-blue-50 border-l-4 border-blue-500 p-2 mb-2 rounded shadow-sm"
-                  >
-                    <p className="text-xs text-gray-500">{event.time}</p>
-                    <p className="font-medium">{event.title}</p>
-                    <p className="text-xs text-blue-600">{event.platform}</p>
+    <div>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-medium">Semana del {formatDate()}</h3>
+        <button className="px-3 py-1 bg-blue-900 text-white rounded hover:bg-blue-800 transition-colors">
+          + Nuevo Evento
+        </button>
+      </div>
+
+      <div className="overflow-x-auto">
+        <div className="grid grid-cols-7 gap-4 min-w-[800px]">
+          {weekDays.map((day) => (
+            <div key={day} className="flex flex-col">
+              <div className="bg-gray-100 p-2 text-center font-medium rounded-t-lg">
+                {day}
+              </div>
+              <div className="bg-white border border-gray-200 rounded-b-lg p-2 h-64 overflow-y-auto">
+                {weekEvents[day].length > 0 ? (
+                  weekEvents[day].map((event, index) => (
+                    <div 
+                      key={`${day}-${index}`}
+                      className="bg-blue-50 border-l-4 border-blue-500 p-2 mb-2 rounded shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                    >
+                      <p className="text-xs text-gray-500">{event.time}</p>
+                      <p className="font-medium">{event.title}</p>
+                      <p className="text-xs text-blue-600">{event.platform}</p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="h-full flex items-center justify-center text-gray-400 text-sm">
+                    Sin eventos
                   </div>
-                ))
-              ) : (
-                <div className="h-full flex items-center justify-center text-gray-400 text-sm">
-                  Sin eventos
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+      </div>
+
+      <div className="flex mt-4 text-sm">
+        <div className="flex items-center mr-4">
+          <div className="w-3 h-3 bg-blue-100 border-l-4 border-blue-500 mr-1"></div>
+          <span>Eventos</span>
+        </div>
       </div>
     </div>
   );
-};
-
-export default ContentCalendar; 
+} 

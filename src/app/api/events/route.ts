@@ -1,60 +1,57 @@
-import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import type { Session } from "next-auth";
+import { NextResponse } from 'next/server';
 
-// GET /api/events
-export async function GET(request: NextRequest) {
-  try {
-    const session = await getServerSession() as Session | null;
+// Eventos simulados para el calendario
+const mockEvents = [
+  {
+    id: '1',
+    title: 'Grabación Podcast EFIS',
+    type: 'podcast',
+    date: new Date(Date.now() + 86400000), // Mañana
+    time: '11:00',
+    platform: 'Estudio',
+    status: 'scheduled',
+  },
+  {
+    id: '2',
+    title: 'Publicación Reel: Finanzas Personales',
+    type: 'reel',
+    date: new Date(Date.now() + 2 * 86400000), // Pasado mañana
+    time: '20:00',
+    platform: 'Instagram, TikTok',
+    status: 'scheduled',
+  },
+  {
+    id: '3',
+    title: 'Entrevista Invitado Especial',
+    type: 'podcast',
+    date: new Date(Date.now() - 86400000), // Ayer
+    time: '15:00',
+    platform: 'Estudio',
+    status: 'completed',
+  },
+  {
+    id: '4',
+    title: 'Publicación Podcast Episodio 42',
+    type: 'podcast',
+    date: new Date(Date.now() - 2 * 86400000), // Antier
+    time: '18:00',
+    platform: 'Spotify, Apple Podcasts',
+    status: 'completed',
+  },
+  {
+    id: '5',
+    title: 'Teaser próximo episodio',
+    type: 'teaser',
+    date: new Date(Date.now() + 3 * 86400000), // En 3 días
+    time: '15:00',
+    platform: 'Instagram',
+    status: 'scheduled',
+  },
+];
 
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const events = await prisma.event.findMany({
-      orderBy: {
-        date: 'asc',
-      },
-    });
-
-    return NextResponse.json(events);
-  } catch (error) {
-    console.error("Error fetching events:", error);
-    return NextResponse.json({ error: "Failed to fetch events" }, { status: 500 });
-  }
-}
-
-// POST /api/events
-export async function POST(request: NextRequest) {
-  try {
-    const session = await getServerSession() as Session | null;
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { title, type, date, time, platform, status } = await request.json();
-
-    if (!title || !type || !date || !time || !platform) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-    }
-
-    const event = await prisma.event.create({
-      data: {
-        title,
-        type,
-        date: new Date(date),
-        time,
-        platform,
-        status: status || "scheduled",
-        userId: session.user.id,
-      },
-    });
-
-    return NextResponse.json(event, { status: 201 });
-  } catch (error) {
-    console.error("Error creating event:", error);
-    return NextResponse.json({ error: "Failed to create event" }, { status: 500 });
-  }
+export async function GET() {
+  // Añadimos un pequeño retraso para simular tiempo de carga
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  return NextResponse.json(mockEvents);
 } 

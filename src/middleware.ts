@@ -1,11 +1,14 @@
-// Middleware deshabilitado temporalmente para permitir acceso directo
+// Middleware deshabilitado para permitir acceso directo sin autenticación
 
-export function middleware() {
-  // No hacer nada - middleware deshabilitado
-  return;
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  // No realizar ninguna redirección - acceso abierto a todas las rutas
+  return NextResponse.next();
 }
 
-// Configuración mínima para mantener la estructura
 export const config = {
-  matcher: [],
+  // No aplicar a rutas estáticas o de API
+  matcher: ['/((?!_next|api|static|favicon.ico|images).*)'],
 }; 
