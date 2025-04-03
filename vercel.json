@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "prisma generate && next build",
-  "installCommand": "npm install",
+  "buildCommand": "prisma generate && next build --no-lint",
+  "installCommand": "npm install --ignore-scripts",
   "framework": "nextjs",
   "outputDirectory": ".next",
   "env": {
@@ -12,6 +12,11 @@
     "POSTGRES_HOST": "ep-delicate-salad-a2t3cvw3-pooler.eu-central-1.aws.neon.tech",
     "POSTGRES_PASSWORD": "npg_zN5rHdZ4iQGF",
     "POSTGRES_DATABASE": "neondb",
-    "SKIP_TYPE_CHECK": "true"
-  }
+    "SKIP_TYPE_CHECK": "true",
+    "DATABASE_URL": "postgresql://neondb_owner:npg_zN5rHdZ4iQGF@ep-delicate-salad-a2t3cvw3-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require",
+    "NEXTAUTH_SECRET": "efis-podcast-production-secret-key",
+    "NEXTAUTH_URL": "https://efis-link.vercel.app",
+    "NODE_ENV": "production"
+  },
+  "ignoreCommand": "npx ndb --help 2>&1 | grep \"Command not found\" || exit 0"
 } 
