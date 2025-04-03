@@ -3,25 +3,25 @@ import type { NextRequest } from 'next/server';
 import { initializeDatabase } from './lib/initializeDb';
 
 // Variable para controlar si ya se inicializó la base de datos
-let dbInitialized = false;
+let databaseInitialized = false;
 
 // Este middleware se ejecuta antes de cada solicitud
 export async function middleware(request: NextRequest) {
-  // Solo inicializar la base de datos una vez
-  if (!dbInitialized) {
+  // Solo intentar inicializar si no se ha hecho previamente
+  if (!databaseInitialized) {
+    console.log('Middleware: Iniciando proceso de inicialización de base de datos...');
     try {
-      console.log('Iniciando inicialización de base de datos desde middleware...');
-      // Inicializar la base de datos en segundo plano
-      initializeDatabase().then(success => {
-        if (success) {
-          console.log('Base de datos inicializada correctamente desde middleware');
-          dbInitialized = true;
-        } else {
-          console.error('Error al inicializar la base de datos desde middleware');
-        }
-      });
+      const success = await initializeDatabase();
+      databaseInitialized = success;
+      if (success) {
+        console.log('Middleware: Base de datos inicializada correctamente');
+      } else {
+        console.error('Middleware: Falló la inicialización de la base de datos, pero continuando con la aplicación');
+      }
     } catch (error) {
-      console.error('Error al intentar inicializar la base de datos:', error);
+      console.error('Middleware: Error crítico durante la inicialización de la base de datos:', error);
+      // Aún así marcamos como inicializado para no seguir intentándolo
+      databaseInitialized = true;
     }
   }
   
@@ -32,11 +32,5 @@ export async function middleware(request: NextRequest) {
 
 // Configurar para que se ejecute en todas las rutas
 export const config = {
-  matcher: [
-    /*
-     * Excluir todas las rutas que no deberían activar el middleware.
-     * Agregar más patrones aquí si es necesario.
-     */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 }; 
