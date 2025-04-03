@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -37,7 +37,7 @@ export default function Dashboard() {
           <div className="flex items-center space-x-4">
             <span>Bienvenido, {session.user.name || session.user.email}</span>
             <button
-              onClick={() => router.push("/api/auth/signout")}
+              onClick={() => signOut({ callbackUrl: '/login' })}
               className="bg-red-700 px-4 py-2 rounded-lg hover:bg-red-800"
             >
               Cerrar sesión
