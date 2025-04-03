@@ -25,16 +25,16 @@
     "bcrypt": "^5.1.1"
   },
   "devDependencies": {
-    "typescript": "^5.3.3",
-    "@types/node": "^20.11.30",
-    "@types/react": "^18.2.66",
+    "@types/bcrypt": "^5.0.0",
+    "@types/node": "^20.8.2",
+    "@types/react": "^18.2.25",
     "@types/react-dom": "^18.2.18",
-    "@types/bcrypt": "^5.0.2",
     "@types/next-auth": "^3.15.0",
     "eslint": "^8.56.0",
     "eslint-config-next": "^14.0.4",
-    "prisma": "^5.22.0",
-    "ts-node": "^10.9.1"
+    "prisma": "^5.4.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
   },
   "overrides": {
     "are-we-there-yet": "^3.0.1",
