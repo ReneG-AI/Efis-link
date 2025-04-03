@@ -1,32 +1,47 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { initializeDatabase } from './lib/initializeDb';
+import { PrismaClient } from '@prisma/client';
+import { getToken } from 'next-auth/jwt';
 
-// Variable para controlar si ya se inicializó la base de datos
-let databaseInitialized = false;
+// Inicialización de Prisma
+let prisma: PrismaClient;
 
-// Este middleware se ejecuta antes de cada solicitud
+if (process.env.NODE_ENV === 'production') {
+  prisma = new PrismaClient();
+} else {
+  if (!(global as any).prisma) {
+    (global as any).prisma = new PrismaClient();
+  }
+  prisma = (global as any).prisma;
+}
+
+// Rutas públicas que no requieren autenticación
+const publicRoutes = ['/login', '/api/auth'];
+
 export async function middleware(request: NextRequest) {
-  // Solo intentar inicializar si no se ha hecho previamente
-  if (!databaseInitialized) {
-    console.log('Middleware: Iniciando proceso de inicialización de base de datos...');
-    try {
-      const success = await initializeDatabase();
-      databaseInitialized = success;
-      if (success) {
-        console.log('Middleware: Base de datos inicializada correctamente');
-      } else {
-        console.error('Middleware: Falló la inicialización de la base de datos, pero continuando con la aplicación');
-      }
-    } catch (error) {
-      console.error('Middleware: Error crítico durante la inicialización de la base de datos:', error);
-      // Aún así marcamos como inicializado para no seguir intentándolo
-      databaseInitialized = true;
+  const { pathname } = request.nextUrl;
+  
+  // Inicialización de la base de datos
+  try {
+    await prisma.$connect();
+    console.log('Base de datos conectada correctamente');
+  } catch (error) {
+    console.error('Error al conectar a la base de datos:', error);
+  }
+  
+  // Verificar autenticación para rutas protegidas
+  if (!publicRoutes.some(route => pathname.startsWith(route))) {
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    
+    // Redireccionar a login si no hay sesión
+    if (!token && pathname !== '/') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      url.searchParams.set('callbackUrl', encodeURI(request.url));
+      return NextResponse.redirect(url);
     }
   }
   
-  // No necesitamos modificar la solicitud, solo asegurarnos de que
-  // Next.js inicialice correctamente
   return NextResponse.next();
 }
 

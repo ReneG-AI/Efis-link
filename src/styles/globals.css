@@ -4,28 +4,38 @@
 
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-rgb: 255, 255, 255;
+  --background-start-rgb: 240, 240, 240;
+  --background-end-rgb: 255, 255, 255;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
 }
 
 @layer components {
   .btn {
-    @apply px-4 py-2 rounded-md font-medium transition-all;
+    @apply px-4 py-2 rounded-md font-medium transition-colors;
   }
   
   .btn-primary {
-    @apply bg-efis-blue text-white hover:bg-blue-800;
+    @apply bg-blue-800 text-white hover:bg-blue-900;
   }
   
   .btn-secondary {
-    @apply bg-gray-200 text-efis-black hover:bg-gray-300;
+    @apply bg-gray-200 text-gray-800 hover:bg-gray-300;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700;
   }
 
   .card {
-    @apply bg-white rounded-lg shadow-md p-6;
+    @apply bg-white rounded-lg shadow-md p-6 border border-gray-100;
   }
 } 
