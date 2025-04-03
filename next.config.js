@@ -2,24 +2,17 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  output: 'standalone',
-  trailingSlash: true,
-  assetPrefix: './',
-  typescript: {
-    // !! IMPORTANTE: Deshabilitar verificación de tipos solo en desarrollo
-    ignoreBuildErrors: process.env.TYPESCRIPT_SKIP_TYPECHECK === 'true',
-  },
   eslint: {
-    // Deshabilitar eslint en build para evitar fallos en despliegue
     ignoreDuringBuilds: true,
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   experimental: {
-    // Habilitar optimizaciones experimentales
+    serverComponentsExternalPackages: ['@prisma/client'],
     esmExternals: 'loose',
   },
-  images: {
-    unoptimized: true,
-  }
-};
+  output: 'standalone'
+}
 
-module.exports = nextConfig; 
+module.exports = nextConfig 

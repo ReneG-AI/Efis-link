@@ -1,8 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
-// PrismaClient es adjuntado al objeto global en desarrollo para prevenir
-// múltiples instancias del cliente Prisma siendo creadas durante las recargas en caliente
-// Aprende más: https://pris.ly/d/help/next-js-best-practices
+// Prevenir múltiples instancias de Prisma Client en desarrollo
+// https://www.prisma.io/docs/concepts/components/prisma-client/working-with-prismaclient/instantiate-prisma-client
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
