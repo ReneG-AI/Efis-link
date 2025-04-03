@@ -1,105 +1,92 @@
 import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt';
 
-// Crear un cliente Prisma dedicado para la inicialización
-const prisma = new PrismaClient({
-  errorFormat: 'pretty',
-  log: ['info', 'warn', 'error'],
-});
+// Inicialización de Prisma
+let prisma: PrismaClient;
+
+if (process.env.NODE_ENV === 'production') {
+  prisma = new PrismaClient();
+} else {
+  if (!(global as any).prisma) {
+    (global as any).prisma = new PrismaClient();
+  }
+  prisma = (global as any).prisma;
+}
 
 export async function initializeDatabase() {
   try {
-    console.log('Inicializando base de datos...');
-    
-    // Verificar la conexión
     await prisma.$connect();
-    console.log('Conexión a la base de datos establecida correctamente');
-    
-    // Crear usuario administrador si no existe
-    const adminExists = await prisma.user.findUnique({
+    console.log('Conectado a la base de datos');
+
+    // Comprobar si ya existe un usuario admin
+    const adminCount = await prisma.user.count({
       where: {
-        email: 'admin@efispodcast.com',
-      },
-    }).catch(error => {
-      console.error('Error al verificar si existe el usuario admin:', error);
-      return null;
+        email: 'info@efis.es'
+      }
     });
 
-    if (!adminExists) {
-      console.log('Creando usuario administrador...');
-      try {
-        const hashedPassword = await bcrypt.hash('adminefis2024', 10);
-
-        await prisma.user.create({
-          data: {
-            email: 'admin@efispodcast.com',
-            name: 'EFIS Admin',
-            password: hashedPassword,
-            role: 'admin',
-          },
-        });
-
-        console.log('Usuario administrador creado correctamente');
-      } catch (error) {
-        console.error('Error al crear usuario administrador:', error);
-      }
+    // Si no existe, crearlo
+    if (adminCount === 0) {
+      const hashedPassword = await bcrypt.hash('Ef1sP0dcast!', 10);
+      
+      await prisma.user.create({
+        data: {
+          name: 'Admin EFIS',
+          email: 'info@efis.es',
+          password: hashedPassword,
+          role: 'ADMIN'
+        }
+      });
+      
+      console.log('Usuario administrador creado correctamente');
     } else {
       console.log('El usuario administrador ya existe');
     }
-    
+
     // Crear algunos eventos de ejemplo si no existen
-    try {
-      const eventsCount = await prisma.event.count();
-      
-      if (eventsCount === 0) {
-        console.log('Creando eventos de ejemplo...');
-        
-        const adminUser = await prisma.user.findUnique({
-          where: {
-            email: 'admin@efispodcast.com',
-          },
-        });
-        
-        if (adminUser) {
-          await prisma.event.createMany({
-            data: [
-              {
-                title: 'Grabación Podcast',
-                type: 'podcast',
-                date: new Date(2024, 3, 10), // 10 de abril de 2024
-                time: '15:00',
-                platform: 'Zoom',
-                status: 'scheduled',
-                userId: adminUser.id,
-              },
-              {
-                title: 'Publicación Reel',
-                type: 'reel',
-                date: new Date(2024, 3, 12), // 12 de abril de 2024
-                time: '10:00',
-                platform: 'Instagram',
-                status: 'scheduled',
-                userId: adminUser.id,
-              },
-            ],
-          });
-          
-          console.log('Eventos de ejemplo creados correctamente');
-        } else {
-          console.log('No se encontró el usuario administrador para asociar eventos');
-        }
-      } else {
-        console.log('Ya existen eventos en la base de datos');
-      }
-    } catch (error) {
-      console.error('Error al verificar o crear eventos:', error);
-    }
+    const eventCount = await prisma.event.count();
     
-    await prisma.$disconnect();
+    if (eventCount === 0) {
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      
+      const nextWeek = new Date(today);
+      nextWeek.setDate(today.getDate() + 7);
+      
+      await prisma.event.createMany({
+        data: [
+          {
+            title: 'Grabación Podcast EFIS',
+            type: 'PODCAST',
+            date: tomorrow,
+            time: '11:00',
+            platform: 'Zoom',
+            status: 'SCHEDULED',
+            userId: 1
+          },
+          {
+            title: 'Publicación Reel: Finanzas Personales',
+            type: 'REEL',
+            date: nextWeek,
+            time: '20:00',
+            platform: 'Instagram, TikTok',
+            status: 'SCHEDULED',
+            userId: 1
+          }
+        ]
+      });
+      
+      console.log('Eventos de ejemplo creados correctamente');
+    } else {
+      console.log('Ya existen eventos en la base de datos');
+    }
+
     return true;
   } catch (error) {
     console.error('Error al inicializar la base de datos:', error);
-    await prisma.$disconnect();
     return false;
+  } finally {
+    await prisma.$disconnect();
   }
 } 
