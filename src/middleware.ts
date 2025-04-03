@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 // Rutas públicas que no requieren autenticación
-const publicRoutes = ['/login', '/api/auth'];
+const publicRoutes = ['/login', '/api/auth', '/_next', '/favicon.ico', '/images'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   // Verificar autenticación para rutas protegidas
-  if (!publicRoutes.some(route => pathname.startsWith(route)) && !pathname.includes('_next')) {
+  if (!publicRoutes.some(route => pathname.startsWith(route))) {
     const token = await getToken({ 
       req: request, 
       secret: process.env.NEXTAUTH_SECRET 
@@ -26,7 +26,7 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Configurar para que se ejecute en todas las rutas
+// Configurar para que se ejecute en todas las rutas excepto recursos estáticos
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|images).*)'],
 }; 
