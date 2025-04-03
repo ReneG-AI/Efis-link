@@ -1,93 +1,44 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
-import { 
-  FaHome, 
-  FaCalendarAlt, 
-  FaShareAlt, 
-  FaChartBar, 
-  FaCog, 
-  FaSignOutAlt 
-} from "react-icons/fa";
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function Sidebar() {
+  const router = useRouter();
   const pathname = usePathname();
 
-  const isActive = (path: string) => {
-    return pathname === path ? "bg-blue-900" : "";
-  };
+  const menuItems = [
+    { label: 'Dashboard', path: '/dashboard', icon: '📊' },
+    { label: 'Calendario', path: '/calendar', icon: '📅' },
+    { label: 'Publicaciones', path: '/publications', icon: '📝' },
+    { label: 'Redes Sociales', path: '/social', icon: '📱' },
+    { label: 'Estadísticas', path: '/stats', icon: '📈' },
+    { label: 'Configuración', path: '/settings', icon: '⚙️' },
+  ];
 
   return (
-    <div className="flex flex-col w-64 bg-blue-800 text-white">
-      <div className="p-4 text-xl font-bold border-b border-blue-700">
-        EFIS Podcast
+    <aside className="bg-blue-900 text-white w-64 min-h-screen flex-shrink-0 hidden md:block">
+      <div className="p-6">
+        <h2 className="text-2xl font-bold">EFIS Podcast</h2>
+        <p className="text-blue-200 text-sm">Panel de Control</p>
       </div>
       
-      <nav className="flex-1 overflow-y-auto">
-        <ul className="p-2">
-          <li>
-            <Link 
-              href="/dashboard" 
-              className={`flex items-center px-4 py-3 mt-2 rounded hover:bg-blue-900 ${isActive("/dashboard")}`}
-            >
-              <FaHome className="mr-3" />
-              Dashboard
-            </Link>
-          </li>
-          
-          <li>
-            <Link 
-              href="/calendar" 
-              className={`flex items-center px-4 py-3 mt-2 rounded hover:bg-blue-900 ${isActive("/calendar")}`}
-            >
-              <FaCalendarAlt className="mr-3" />
-              Calendario
-            </Link>
-          </li>
-          
-          <li>
-            <Link 
-              href="/social" 
-              className={`flex items-center px-4 py-3 mt-2 rounded hover:bg-blue-900 ${isActive("/social")}`}
-            >
-              <FaShareAlt className="mr-3" />
-              Redes Sociales
-            </Link>
-          </li>
-          
-          <li>
-            <Link 
-              href="/stats" 
-              className={`flex items-center px-4 py-3 mt-2 rounded hover:bg-blue-900 ${isActive("/stats")}`}
-            >
-              <FaChartBar className="mr-3" />
-              Estadísticas
-            </Link>
-          </li>
-          
-          <li>
-            <Link 
-              href="/settings" 
-              className={`flex items-center px-4 py-3 mt-2 rounded hover:bg-blue-900 ${isActive("/settings")}`}
-            >
-              <FaCog className="mr-3" />
-              Configuración
-            </Link>
-          </li>
+      <nav className="mt-6">
+        <ul className="space-y-2">
+          {menuItems.map((item) => (
+            <li key={item.path}>
+              <button
+                onClick={() => router.push(item.path)}
+                className={`flex items-center w-full px-6 py-3 text-left hover:bg-blue-800 transition-colors ${
+                  pathname === item.path ? 'bg-blue-800 border-l-4 border-white' : ''
+                }`}
+              >
+                <span className="mr-3">{item.icon}</span>
+                {item.label}
+              </button>
+            </li>
+          ))}
         </ul>
       </nav>
-      
-      <div className="p-4 border-t border-blue-700">
-        <button 
-          onClick={() => signOut({ callbackUrl: "/login" })}
-          className="flex items-center w-full px-4 py-2 mt-2 rounded hover:bg-red-600"
-        >
-          <FaSignOutAlt className="mr-3" />
-          Cerrar sesión
-        </button>
-      </div>
-    </div>
+    </aside>
   );
 } 

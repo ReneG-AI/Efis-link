@@ -1,27 +1,17 @@
 "use client";
 
 import { useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    // Si la sesión está cargando, no hacer nada
-    if (status === 'loading') return;
-    
-    // Si hay una sesión, redirigir al dashboard
-    if (session) {
-      router.push('/dashboard');
-    } else {
-      // Si no hay sesión, redirigir al login
-      router.push('/login');
-    }
-  }, [session, status, router]);
+    // Redirigir directamente al dashboard sin autenticación
+    router.push('/dashboard');
+  }, [router]);
 
-  // Mostrar un mensaje de carga mientras se decide la redirección
+  // Mostrar un mensaje de carga mientras se redirige
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
       <div className="animate-pulse text-xl text-blue-900 font-semibold mb-4">
