@@ -6,6 +6,9 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export const authOptions = {
+  pages: {
+    signIn: '/login',
+  },
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -55,29 +58,26 @@ export const authOptions = {
       }
     })
   ],
-  pages: {
-    signIn: '/login',
-  },
-  debug: process.env.NODE_ENV === 'development',
-  session: {
-    strategy: "jwt",
-  },
-  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    jwt: async ({ token, user }) => {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
       }
       return token;
     },
-    session: async ({ session, token }) => {
+    async session({ session, token }) {
       if (token) {
         session.user.id = token.id;
         session.user.role = token.role;
       }
       return session;
     }
+  },
+  debug: process.env.NODE_ENV === 'development',
+  secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
   }
 };
 

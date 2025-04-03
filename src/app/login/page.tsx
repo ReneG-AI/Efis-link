@@ -1,40 +1,62 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from 'react';
+import { signIn, useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const { data: session, status } = useSession();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Redireccionar si ya hay una sesión
+  useEffect(() => {
+    if (status === 'authenticated' && session) {
+      router.push('/dashboard');
+    }
+  }, [session, status, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setError('');
 
     try {
-      const result = await signIn("credentials", {
+      const result = await signIn('credentials', {
         redirect: false,
         email,
-        password,
+        password
       });
 
       if (result?.error) {
-        setError("Credenciales inválidas");
-      } else {
-        router.push("/dashboard");
+        setError('Credenciales inválidas. Verifica tu email y contraseña.');
+      } else if (result?.ok) {
+        router.push('/dashboard');
       }
     } catch (error) {
-      setError("Error al iniciar sesión");
-      console.error(error);
+      console.error('Error en login:', error);
+      setError('Error al iniciar sesión. Inténtalo de nuevo más tarde.');
     } finally {
       setLoading(false);
     }
   };
+
+  // Si está cargando la sesión, mostrar spinner
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="w-16 h-16 border-4 border-blue-900 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  // Si ya está autenticado, no mostrar nada (redireccionará por el useEffect)
+  if (status === 'authenticated') {
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -83,8 +105,13 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full bg-blue-900 text-white py-2 px-4 rounded-lg hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            {loading ? "Iniciando sesión..." : "Iniciar sesión"}
+            {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
           </button>
+
+          <div className="text-sm text-center text-gray-500 mt-4">
+            Email: admin@efis-podcast.com<br />
+            Contraseña: Admin123!
+          </div>
         </form>
       </div>
     </div>
