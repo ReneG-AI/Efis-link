@@ -1,23 +1,21 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Redireccionar si ya hay una sesión
+  // Solo ejecutar código dependiente del cliente después del montaje
   useEffect(() => {
-    if (status === 'authenticated' && session) {
-      router.push('/dashboard');
-    }
-  }, [session, status, router]);
+    setMounted(true);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,18 +42,13 @@ export default function LoginPage() {
     }
   };
 
-  // Si está cargando la sesión, mostrar spinner
-  if (status === 'loading') {
+  // Solo mostrar carga mientras se monta el componente
+  if (!mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="w-16 h-16 border-4 border-blue-900 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
-  }
-
-  // Si ya está autenticado, no mostrar nada (redireccionará por el useEffect)
-  if (status === 'authenticated') {
-    return null;
   }
 
   return (
