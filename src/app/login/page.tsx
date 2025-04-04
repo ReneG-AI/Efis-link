@@ -42,8 +42,11 @@ export default function LoginPage() {
       <ClientOnly>
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
           <h1 className="text-2xl font-bold text-center text-blue-900 mb-8">
-            EFIS Podcast Panel
+            Efis Link
           </h1>
+          <p className="text-center text-gray-600 mb-6">
+            Plataforma de gestión de contenido para redes sociales
+          </p>
 
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">

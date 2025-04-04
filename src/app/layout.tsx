@@ -5,8 +5,8 @@ import { Providers } from './providers';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'EFIS Podcast Panel',
-  description: 'Panel de control para gestionar el contenido de EFIS Podcast',
+  title: 'Efis Link | Panel de Control',
+  description: 'Plataforma para gestionar y planificar el contenido de Efis Podcast y Efis App en redes sociales',
   icons: {
     icon: '/favicon.ico',
   },
