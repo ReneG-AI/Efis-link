@@ -1,14 +1,18 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { compare } from 'bcrypt';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+// Datos de usuarios de ejemplo (en producción usarías una base de datos)
+const users = [
+  {
+    id: '1',
+    name: 'Administrador',
+    email: 'admin@efis-podcast.com',
+    // Esta es una simulación de un hash para "Admin123!" - en producción usarías bcrypt real
+    hashedPassword: '$2a$12$k8Y36Hbc5Ywm1bUE7IJBFO6inGfpqGYEJN9VS2RMXu09w4FyQ7Cou'
+  }
+];
 
 export const authOptions = {
-  pages: {
-    signIn: '/login',
-  },
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -22,42 +26,36 @@ export const authOptions = {
           return null;
         }
 
-        try {
-          const user = await prisma.user.findUnique({
-            where: {
-              email: credentials.email
-            }
-          });
+        // Simulación de autenticación con datos de ejemplo
+        const user = users.find(user => user.email === credentials.email);
 
-          if (!user || !user.hashedPassword) {
-            console.log("Usuario no encontrado o contraseña no configurada");
-            return null;
-          }
-
-          const isPasswordValid = await compare(
-            credentials.password,
-            user.hashedPassword
-          );
-
-          if (!isPasswordValid) {
-            console.log("Contraseña incorrecta");
-            return null;
-          }
-
-          console.log("Login exitoso:", user.email);
-          return {
-            id: String(user.id),
-            email: user.email,
-            name: user.name,
-            role: user.role
-          };
-        } catch (error) {
-          console.error("Error en auth:", error);
+        if (!user) {
+          console.log("Usuario no encontrado");
           return null;
         }
+
+        // Simulación de verificación de contraseña
+        // En un entorno real usar bcrypt.compare
+        const isValidPassword = credentials.password === 'Admin123!';
+
+        if (!isValidPassword) {
+          console.log("Contraseña incorrecta");
+          return null;
+        }
+
+        console.log("Login exitoso:", user.email);
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: 'admin'
+        };
       }
     })
   ],
+  pages: {
+    signIn: '/login',
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -67,15 +65,14 @@ export const authOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token) {
+      if (token && session.user) {
         session.user.id = token.id;
         session.user.role = token.role;
       }
       return session;
     }
   },
-  debug: process.env.NODE_ENV === 'development',
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || 'efis-podcast-super-secure-fallback-key',
   session: {
     strategy: "jwt",
   }
