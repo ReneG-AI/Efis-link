@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 
 interface Idea {
@@ -14,36 +14,61 @@ interface Idea {
 }
 
 export default function IdeasPage() {
-  const [ideas, setIdeas] = useState<Idea[]>([
-    {
-      id: '1',
-      title: 'Tendencias de marketing para podcast',
-      description: 'Recopilar las últimas tendencias de marketing digital específicas para podcasts y crear un reel explicativo de 30 segundos.',
-      platform: 'Instagram',
-      tags: ['marketing', 'tendencias', 'podcast'],
-      status: 'pending',
-      createdAt: new Date()
-    },
-    {
-      id: '2',
-      title: 'Entrevista con experto en SEO',
-      description: 'Fragmentos cortos de la entrevista con Pablo sobre SEO para redes sociales, destacando 3 tips clave.',
-      platform: 'Instagram',
-      tags: ['seo', 'entrevista', 'consejos'],
-      status: 'in-progress',
-      createdAt: new Date(Date.now() - 86400000)
-    },
-    {
-      id: '3',
-      title: 'Behind the scenes de la grabación',
-      description: 'Momentos divertidos y preparación antes de grabar el podcast, mostrando el equipo y la dinámica del equipo.',
-      platform: 'TikTok',
-      tags: ['bts', 'equipo', 'podcast'],
-      status: 'completed',
-      createdAt: new Date(Date.now() - 172800000)
+  const [ideas, setIdeas] = useState<Idea[]>(() => {
+    if (typeof window !== 'undefined') {
+      const savedIdeas = localStorage.getItem('content-ideas');
+      if (savedIdeas) {
+        try {
+          const parsedIdeas = JSON.parse(savedIdeas, (key, value) => {
+            if (key === 'createdAt') {
+              return new Date(value);
+            }
+            return value;
+          });
+          return parsedIdeas;
+        } catch (error) {
+          console.error('Error al cargar ideas guardadas:', error);
+        }
+      }
     }
-  ]);
+    
+    return [
+      {
+        id: '1',
+        title: 'Tendencias de marketing para podcast',
+        description: 'Recopilar las últimas tendencias de marketing digital específicas para podcasts y crear un reel explicativo de 30 segundos.',
+        platform: 'Instagram',
+        tags: ['marketing', 'tendencias', 'podcast'],
+        status: 'pending',
+        createdAt: new Date()
+      },
+      {
+        id: '2',
+        title: 'Entrevista con experto en SEO',
+        description: 'Fragmentos cortos de la entrevista con Pablo sobre SEO para redes sociales, destacando 3 tips clave.',
+        platform: 'Instagram',
+        tags: ['seo', 'entrevista', 'consejos'],
+        status: 'in-progress',
+        createdAt: new Date(Date.now() - 86400000)
+      },
+      {
+        id: '3',
+        title: 'Behind the scenes de la grabación',
+        description: 'Momentos divertidos y preparación antes de grabar el podcast, mostrando el equipo y la dinámica del equipo.',
+        platform: 'TikTok',
+        tags: ['bts', 'equipo', 'podcast'],
+        status: 'completed',
+        createdAt: new Date(Date.now() - 172800000)
+      }
+    ];
+  });
   
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('content-ideas', JSON.stringify(ideas));
+    }
+  }, [ideas]);
+
   const [showModal, setShowModal] = useState(false);
   const [currentIdea, setCurrentIdea] = useState<Partial<Idea>>({
     title: '',

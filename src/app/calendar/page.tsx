@@ -103,38 +103,68 @@ export default function CalendarPage() {
     'Reel', 'Historia', 'Post', 'Carrusel', 'Video', 'Podcast', 'Artículo', 'Grabación'
   ];
 
-  const [events, setEvents] = useState<Event[]>([
-    {
-      id: '1',
-      title: 'Publicación Instagram',
-      date: new Date(),
-      time: '20:00',
-      platform: 'Instagram',
-      contentType: 'Reel',
-      description: 'Resumen del podcast sobre desarrollo personal',
-      color: 'bg-pink-500'
-    },
-    {
-      id: '2',
-      title: 'Publicación LinkedIn',
-      date: addDays(new Date(), 1),
-      time: '20:00',
-      platform: 'LinkedIn',
-      contentType: 'Post',
-      description: 'Artículo sobre liderazgo empresarial',
-      color: 'bg-blue-500'
-    },
-    {
-      id: '3',
-      title: 'Publicación YouTube',
-      date: addDays(new Date(), 2),
-      time: '20:00',
-      platform: 'YouTube',
-      contentType: 'Video',
-      description: 'Entrevista completa con experto en marketing',
-      color: 'bg-red-500'
+  // Estado de eventos
+  const [events, setEvents] = useState<Event[]>(() => {
+    // Intentar cargar eventos desde localStorage
+    if (typeof window !== 'undefined') {
+      const savedEvents = localStorage.getItem('calendar-events');
+      if (savedEvents) {
+        try {
+          // Convertir las fechas de string a objetos Date
+          const parsedEvents = JSON.parse(savedEvents, (key, value) => {
+            if (key === 'date') {
+              return new Date(value);
+            }
+            return value;
+          });
+          return parsedEvents;
+        } catch (error) {
+          console.error('Error al cargar eventos guardados:', error);
+        }
+      }
     }
-  ]);
+    
+    // Eventos por defecto si no hay datos guardados
+    return [
+      {
+        id: '1',
+        title: 'Publicación Instagram',
+        date: new Date(),
+        time: '20:00',
+        platform: 'Instagram',
+        contentType: 'Reel',
+        description: 'Resumen del podcast sobre desarrollo personal',
+        color: 'bg-pink-500'
+      },
+      {
+        id: '2',
+        title: 'Publicación LinkedIn',
+        date: addDays(new Date(), 1),
+        time: '20:00',
+        platform: 'LinkedIn',
+        contentType: 'Post',
+        description: 'Artículo sobre liderazgo empresarial',
+        color: 'bg-blue-500'
+      },
+      {
+        id: '3',
+        title: 'Publicación YouTube',
+        date: addDays(new Date(), 2),
+        time: '20:00',
+        platform: 'YouTube',
+        contentType: 'Video',
+        description: 'Entrevista completa con experto en marketing',
+        color: 'bg-red-500'
+      }
+    ];
+  });
+  
+  // Guardar eventos en localStorage cuando cambien
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('calendar-events', JSON.stringify(events));
+    }
+  }, [events]);
   
   const [newEvent, setNewEvent] = useState<Omit<Event, 'id'>>({
     title: '',
