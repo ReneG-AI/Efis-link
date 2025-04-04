@@ -527,7 +527,7 @@ export default function CalendarPage() {
         const monthStart = startOfMonth(currentDate);
         const monthEnd = endOfMonth(currentDate);
         const firstDay = startOfWeek(monthStart, { weekStartsOn: 1 });
-        const lastDay = addDays(endOfWeeks(monthEnd, { weekStartsOn: 1 }), 1);
+        const lastDay = addDays(endOfWeek(monthEnd, { weekStartsOn: 1 }), 1);
         return eachDayOfInterval({ start: firstDay, end: lastDay });
       
       case 'year':

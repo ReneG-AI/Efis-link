@@ -10,7 +10,7 @@ export default function Sidebar() {
 
   const menuItems = [
     { label: 'Dashboard', path: '/dashboard', icon: '🏠' },
-    { label: 'Calendario', path: '/calendar', icon: '��' },
+    { label: 'Calendario', path: '/calendar', icon: '📅' },
     { label: 'Ideas de Contenido', path: '/ideas', icon: '💡' },
     { label: 'Grabaciones', path: '/recordings', icon: '🎙️' },
     { label: 'Redes Sociales', path: '/social', icon: '📱', subItems: [
