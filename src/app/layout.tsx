@@ -1,15 +1,13 @@
-import './globals.css';
+import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import './globals.css';
 import { Providers } from './providers';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export const metadata = {
-  title: 'Efis Link | Panel de Control',
-  description: 'Plataforma para gestionar y planificar el contenido de Efis Podcast y Efis App en redes sociales',
-  icons: {
-    icon: '/favicon.ico',
-  },
+export const metadata: Metadata = {
+  title: 'Efis Link - Plataforma de Gestión de Contenido',
+  description: 'Sistema de gestión de contenido para el Podcast Efis',
 };
 
 export default function RootLayout({
@@ -20,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
