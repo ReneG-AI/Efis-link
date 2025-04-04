@@ -8,8 +8,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'efis-blue': '#1E3A8A',
-        'efis-black': '#121212',
+        primary: {
+          DEFAULT: '#1E3A8A', // azul oscuro
+          light: '#3B82F6',   // azul claro
+        },
+        secondary: {
+          DEFAULT: '#374151', // gris oscuro
+        },
       },
       fontFamily: {
         sans: ['var(--font-inter)'],
