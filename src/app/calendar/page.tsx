@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import { format, addDays, startOfWeek, endOfWeek, isSameDay, parseISO, getDay, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, addYears, subYears, startOfYear, endOfYear, addWeeks, endOfWeeks } from 'date-fns';
 import { es } from 'date-fns/locale';
+import AuthGuard from '@/components/AuthGuard';
 
 // Tipos
 interface Person {
@@ -646,547 +647,549 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <Sidebar />
-      
-      <div className="flex-1">
-        <header className="bg-blue-900 text-white p-4">
-          <div className="container mx-auto flex justify-between items-center">
-            <div className="flex items-center">
-              <CalendarIcon />
-              <h1 className="text-2xl font-bold ml-2">Calendario de Publicaciones</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span>{format(currentDate, 'MMMM yyyy', { locale: es })}</span>
-            </div>
-          </div>
-        </header>
-
-        <main className="container mx-auto p-6">
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-            {/* Controles de visualización */}
-            <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
-              <div className="flex gap-2">
-                <button 
-                  onClick={() => handleViewModeChange('week')}
-                  className={`px-4 py-2 rounded-lg transition-colors ${
-                    viewMode === 'week' 
-                      ? 'bg-blue-900 text-white' 
-                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                  }`}
-                >
-                  Semana
-                </button>
-                <button 
-                  onClick={() => handleViewModeChange('month')}
-                  className={`px-4 py-2 rounded-lg transition-colors ${
-                    viewMode === 'month' 
-                      ? 'bg-blue-900 text-white' 
-                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                  }`}
-                >
-                  Mes
-                </button>
-                <button 
-                  onClick={() => handleViewModeChange('year')}
-                  className={`px-4 py-2 rounded-lg transition-colors ${
-                    viewMode === 'year' 
-                      ? 'bg-blue-900 text-white' 
-                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                  }`}
-                >
-                  Año
-                </button>
-                <button 
-                  onClick={handleDateFilterToggle}
-                  className={`px-4 py-2 rounded-lg flex items-center transition-colors ${
-                    showDateFilter 
-                      ? 'bg-blue-900 text-white' 
-                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                  }`}
-                >
-                  <FilterIcon />
-                  <span className="ml-1">Fechas</span>
-                </button>
+    <AuthGuard>
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        
+        <div className="flex-1">
+          <header className="bg-blue-900 text-white p-4">
+            <div className="container mx-auto flex justify-between items-center">
+              <div className="flex items-center">
+                <CalendarIcon />
+                <h1 className="text-2xl font-bold ml-2">Calendario de Publicaciones</h1>
               </div>
+              <div className="flex items-center space-x-4">
+                <span>{format(currentDate, 'MMMM yyyy', { locale: es })}</span>
+              </div>
+            </div>
+          </header>
 
-              {showDateFilter && (
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div className="flex items-center">
-                    <span className="mr-2">Desde:</span>
-                    <input 
-                      type="date" 
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      className="border rounded p-2"
-                    />
-                  </div>
-                  <div className="flex items-center">
-                    <span className="mr-2">Hasta:</span>
-                    <input 
-                      type="date" 
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      className="border rounded p-2"
-                    />
-                  </div>
+          <main className="container mx-auto p-6">
+            <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+              {/* Controles de visualización */}
+              <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
+                <div className="flex gap-2">
                   <button 
-                    onClick={handleDateFilterApply}
-                    className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
-                  >
-                    Aplicar
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Filtros y controles de navegación */}
-            <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
-              <div className="flex gap-4 flex-wrap md:flex-nowrap">
-                <button 
-                  onClick={handlePrevious}
-                  className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
-                >
-                  {viewMode === 'week' ? 'Semana Anterior' : 
-                   viewMode === 'month' ? 'Mes Anterior' : 'Año Anterior'}
-                </button>
-                <h2 className="text-xl font-semibold whitespace-nowrap">
-                  {viewMode === 'week' ? (
-                    <>
-                      {format(getDaysToShow()[0], 'dd')} - {format(getDaysToShow()[getDaysToShow().length - 1], 'dd')} de {format(getDaysToShow()[0], 'MMMM', { locale: es })}
-                    </>
-                  ) : viewMode === 'month' ? (
-                    format(currentDate, 'MMMM yyyy', { locale: es })
-                  ) : (
-                    format(currentDate, 'yyyy')
-                  )}
-                </h2>
-                <button 
-                  onClick={handleNext}
-                  className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
-                >
-                  {viewMode === 'week' ? 'Siguiente Semana' : 
-                   viewMode === 'month' ? 'Siguiente Mes' : 'Siguiente Año'}
-                </button>
-              </div>
-
-              <div className="flex gap-2 flex-wrap">
-                <select
-                  value={filterPerson || ''}
-                  onChange={(e) => setFilterPerson(e.target.value || null)}
-                  className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Todas las personas</option>
-                  {people.map(person => (
-                    <option key={person.id} value={person.id}>{person.name} {person.lastName}</option>
-                  ))}
-                </select>
-
-                <select
-                  value={filterPlatform || ''}
-                  onChange={(e) => setFilterPlatform(e.target.value || null)}
-                  className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Todas las plataformas</option>
-                  {platforms.map(platform => (
-                    <option key={platform.name} value={platform.name}>{platform.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex gap-2">
-                <button 
-                  onClick={exportToGoogleCalendar}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
-                >
-                  <ExportIcon />
-                  <span>Google Calendar</span>
-                </button>
-                <button 
-                  onClick={exportToCSV}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
-                >
-                  <DownloadIcon />
-                  <span>Exportar CSV</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Calendario según el modo de visualización */}
-            <div className={`grid ${
-              viewMode === 'week' ? 'grid-cols-7' : 
-              viewMode === 'month' ? 'grid-cols-7' : 
-              'grid-cols-3 md:grid-cols-4 lg:grid-cols-6'
-            } gap-2`}>
-              {getDaysToShow().map((day, index) => {
-                const isCurrentDay = isSameDay(day, new Date());
-                const eventsForDay = getEventsForDay(day);
-                
-                return (
-                  <div 
-                    key={index} 
-                    className={`border rounded-lg overflow-hidden ${
-                      viewMode === 'year' ? 'h-28' : ''
+                    onClick={() => handleViewModeChange('week')}
+                    className={`px-4 py-2 rounded-lg transition-colors ${
+                      viewMode === 'week' 
+                        ? 'bg-blue-900 text-white' 
+                        : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                     }`}
                   >
-                    <div className={`p-2 ${isCurrentDay ? 'bg-blue-100 font-bold' : 'bg-gray-100'}`}>
-                      <div className="text-center">
-                        {viewMode === 'week' && (
-                          <div className="text-sm text-gray-500">
-                            {format(day, 'EEEE', { locale: es })}
-                          </div>
-                        )}
-                        {viewMode === 'year' ? (
-                          <div className="font-medium">{format(day, 'MMMM', { locale: es })}</div>
-                        ) : (
-                          <div className="text-lg">
-                            {format(day, 'd')}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div 
-                      className={`${
-                        viewMode === 'week' 
-                          ? 'min-h-[200px] max-h-[300px]' 
-                          : viewMode === 'month' 
-                            ? 'min-h-[100px] max-h-[150px]' 
-                            : 'min-h-0'
-                      } p-2 cursor-pointer overflow-y-auto`}
-                      onClick={() => handleDayClick(day)}
-                    >
-                      {viewMode === 'year' ? (
-                        // En vista anual, mostrar solo el número de eventos
-                        <div className="text-center">
-                          <span className="font-medium">{eventsForDay.length}</span> 
-                          <span className="text-xs text-gray-500"> eventos</span>
-                        </div>
-                      ) : (
-                        // En vista semanal o mensual, mostrar los eventos
-                        <>
-                          {eventsForDay.map(event => (
-                            <div 
-                              key={event.id} 
-                              className={`p-2 mb-2 rounded-lg ${event.color} text-white text-sm relative group`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEventClick(event);
-                              }}
-                            >
-                              <div className="font-bold">{event.title}</div>
-                              <div className="text-xs">
-                                {event.time} 
-                                {event.endTime && ` - ${event.endTime}`} 
-                                {event.platform && ` · ${event.platform}`}
-                              </div>
-                              {event.people && event.people.length > 0 && (
-                                <div className="flex -space-x-1 mt-1">
-                                  {event.people.map(personId => {
-                                    const person = people.find(p => p.id === personId);
-                                    return person ? (
-                                      <div 
-                                        key={personId}
-                                        className={`w-5 h-5 rounded-full ${person.color} flex items-center justify-center text-xs border border-white overflow-hidden`}
-                                        title={`${person.name} ${person.lastName}`}
-                                      >
-                                        {person.name.charAt(0)}{person.lastName.charAt(0)}
-                                      </div>
-                                    ) : null;
-                                  })}
-                                </div>
-                              )}
-                              <button 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  deleteEvent(event.id);
-                                }}
-                                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                              >
-                                ✕
-                              </button>
-                            </div>
-                          ))}
-                          {eventsForDay.length === 0 && (
-                            <div className="text-center text-gray-400 text-xs p-2">
-                              + Añadir evento
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+                    Semana
+                  </button>
+                  <button 
+                    onClick={() => handleViewModeChange('month')}
+                    className={`px-4 py-2 rounded-lg transition-colors ${
+                      viewMode === 'month' 
+                        ? 'bg-blue-900 text-white' 
+                        : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    }`}
+                  >
+                    Mes
+                  </button>
+                  <button 
+                    onClick={() => handleViewModeChange('year')}
+                    className={`px-4 py-2 rounded-lg transition-colors ${
+                      viewMode === 'year' 
+                        ? 'bg-blue-900 text-white' 
+                        : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    }`}
+                  >
+                    Año
+                  </button>
+                  <button 
+                    onClick={handleDateFilterToggle}
+                    className={`px-4 py-2 rounded-lg flex items-center transition-colors ${
+                      showDateFilter 
+                        ? 'bg-blue-900 text-white' 
+                        : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    }`}
+                  >
+                    <FilterIcon />
+                    <span className="ml-1">Fechas</span>
+                  </button>
+                </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Lista de próximas publicaciones */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">Próximas Publicaciones</h3>
-              <div className="space-y-4">
-                {events
-                  .filter(event => !event.isRecurring) // Excluir eventos de grabación recurrentes
-                  .sort((a, b) => a.date.getTime() - b.date.getTime())
-                  .slice(0, 5)
-                  .map(event => (
-                    <div key={event.id} className="flex items-center p-3 border rounded-lg">
-                      <div className={`w-4 h-4 rounded-full ${event.color} mr-3`}></div>
-                      <div className="flex-1">
-                        <div className="font-semibold">{event.title}</div>
-                        <div className="text-sm text-gray-500">
-                          {format(event.date, 'dd/MM/yyyy')} - {event.time} - {event.platform}
-                        </div>
-                        {event.people && event.people.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {event.people.map(personId => {
-                              const person = people.find(p => p.id === personId);
-                              return person ? (
-                                <span 
-                                  key={personId}
-                                  className={`px-2 py-1 rounded-full text-xs ${person.color} text-white`}
-                                >
-                                  {person.name} {person.lastName}
-                                </span>
-                              ) : null;
-                            })}
-                          </div>
-                        )}
-                      </div>
-                      <button 
-                        onClick={() => deleteEvent(event.id)}
-                        className="text-gray-400 hover:text-red-500"
-                      >
-                        ✕
-                      </button>
+                {showDateFilter && (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center">
+                      <span className="mr-2">Desde:</span>
+                      <input 
+                        type="date" 
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="border rounded p-2"
+                      />
                     </div>
-                  ))}
-                
-                {/* Si no hay eventos próximos */}
-                {events.filter(event => !event.isRecurring).length === 0 && (
-                  <div className="text-center py-6 text-gray-500">
-                    No hay eventos próximos programados.
+                    <div className="flex items-center">
+                      <span className="mr-2">Hasta:</span>
+                      <input 
+                        type="date" 
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="border rounded p-2"
+                      />
+                    </div>
+                    <button 
+                      onClick={handleDateFilterApply}
+                      className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
+                    >
+                      Aplicar
+                    </button>
                   </div>
                 )}
               </div>
-            </div>
-            
-            {/* Resumen */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">Resumen</h3>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span>Total eventos</span>
-                    <span className="font-bold text-lg">{events.length}</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span>Grabaciones</span>
-                    <span className="font-bold text-lg">
-                      {events.filter(e => e.isRecurring).length}
-                    </span>
-                  </div>
-                </div>
-                
-                <h4 className="font-medium">Por plataforma</h4>
-                <div className="space-y-2">
-                  {platforms.map(platform => {
-                    const count = events.filter(e => e.platform === platform.name).length;
-                    return (
-                      <div key={platform.name} className="flex items-center justify-between p-2 border-b">
-                        <div className="flex items-center">
-                          <div className={`w-3 h-3 rounded-full ${platform.color} mr-2`}></div>
-                          <span>{platform.name}</span>
-                        </div>
-                        <div className="font-semibold">{count}</div>
-                      </div>
-                    );
-                  })}
+
+              {/* Filtros y controles de navegación */}
+              <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
+                <div className="flex gap-4 flex-wrap md:flex-nowrap">
+                  <button 
+                    onClick={handlePrevious}
+                    className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
+                  >
+                    {viewMode === 'week' ? 'Semana Anterior' : 
+                     viewMode === 'month' ? 'Mes Anterior' : 'Año Anterior'}
+                  </button>
+                  <h2 className="text-xl font-semibold whitespace-nowrap">
+                    {viewMode === 'week' ? (
+                      <>
+                        {format(getDaysToShow()[0], 'dd')} - {format(getDaysToShow()[getDaysToShow().length - 1], 'dd')} de {format(getDaysToShow()[0], 'MMMM', { locale: es })}
+                      </>
+                    ) : viewMode === 'month' ? (
+                      format(currentDate, 'MMMM yyyy', { locale: es })
+                    ) : (
+                      format(currentDate, 'yyyy')
+                    )}
+                  </h2>
+                  <button 
+                    onClick={handleNext}
+                    className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
+                  >
+                    {viewMode === 'week' ? 'Siguiente Semana' : 
+                     viewMode === 'month' ? 'Siguiente Mes' : 'Siguiente Año'}
+                  </button>
                 </div>
 
-                <h4 className="font-medium">Por persona</h4>
-                <div className="space-y-2">
-                  {people.map(person => {
-                    const count = events.filter(e => e.people?.includes(person.id)).length;
-                    return (
-                      <div key={person.id} className="flex items-center justify-between p-2 border-b">
-                        <div className="flex items-center">
-                          <div className={`w-5 h-5 rounded-full ${person.color} flex items-center justify-center text-xs text-white`}>
-                            {person.name.charAt(0)}{person.lastName.charAt(0)}
-                          </div>
-                          <span className="ml-2">{person.name} {person.lastName}</span>
+                <div className="flex gap-2 flex-wrap">
+                  <select
+                    value={filterPerson || ''}
+                    onChange={(e) => setFilterPerson(e.target.value || null)}
+                    className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Todas las personas</option>
+                    {people.map(person => (
+                      <option key={person.id} value={person.id}>{person.name} {person.lastName}</option>
+                    ))}
+                  </select>
+
+                  <select
+                    value={filterPlatform || ''}
+                    onChange={(e) => setFilterPlatform(e.target.value || null)}
+                    className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Todas las plataformas</option>
+                    {platforms.map(platform => (
+                      <option key={platform.name} value={platform.name}>{platform.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex gap-2">
+                  <button 
+                    onClick={exportToGoogleCalendar}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                  >
+                    <ExportIcon />
+                    <span>Google Calendar</span>
+                  </button>
+                  <button 
+                    onClick={exportToCSV}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                  >
+                    <DownloadIcon />
+                    <span>Exportar CSV</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Calendario según el modo de visualización */}
+              <div className={`grid ${
+                viewMode === 'week' ? 'grid-cols-7' : 
+                viewMode === 'month' ? 'grid-cols-7' : 
+                'grid-cols-3 md:grid-cols-4 lg:grid-cols-6'
+              } gap-2`}>
+                {getDaysToShow().map((day, index) => {
+                  const isCurrentDay = isSameDay(day, new Date());
+                  const eventsForDay = getEventsForDay(day);
+                  
+                  return (
+                    <div 
+                      key={index} 
+                      className={`border rounded-lg overflow-hidden ${
+                        viewMode === 'year' ? 'h-28' : ''
+                      }`}
+                    >
+                      <div className={`p-2 ${isCurrentDay ? 'bg-blue-100 font-bold' : 'bg-gray-100'}`}>
+                        <div className="text-center">
+                          {viewMode === 'week' && (
+                            <div className="text-sm text-gray-500">
+                              {format(day, 'EEEE', { locale: es })}
+                            </div>
+                          )}
+                          {viewMode === 'year' ? (
+                            <div className="font-medium">{format(day, 'MMMM', { locale: es })}</div>
+                          ) : (
+                            <div className="text-lg">
+                              {format(day, 'd')}
+                            </div>
+                          )}
                         </div>
-                        <div className="font-semibold">{count}</div>
                       </div>
-                    );
-                  })}
+                      <div 
+                        className={`${
+                          viewMode === 'week' 
+                            ? 'min-h-[200px] max-h-[300px]' 
+                            : viewMode === 'month' 
+                              ? 'min-h-[100px] max-h-[150px]' 
+                              : 'min-h-0'
+                        } p-2 cursor-pointer overflow-y-auto`}
+                        onClick={() => handleDayClick(day)}
+                      >
+                        {viewMode === 'year' ? (
+                          // En vista anual, mostrar solo el número de eventos
+                          <div className="text-center">
+                            <span className="font-medium">{eventsForDay.length}</span> 
+                            <span className="text-xs text-gray-500"> eventos</span>
+                          </div>
+                        ) : (
+                          // En vista semanal o mensual, mostrar los eventos
+                          <>
+                            {eventsForDay.map(event => (
+                              <div 
+                                key={event.id} 
+                                className={`p-2 mb-2 rounded-lg ${event.color} text-white text-sm relative group`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEventClick(event);
+                                }}
+                              >
+                                <div className="font-bold">{event.title}</div>
+                                <div className="text-xs">
+                                  {event.time} 
+                                  {event.endTime && ` - ${event.endTime}`} 
+                                  {event.platform && ` · ${event.platform}`}
+                                </div>
+                                {event.people && event.people.length > 0 && (
+                                  <div className="flex -space-x-1 mt-1">
+                                    {event.people.map(personId => {
+                                      const person = people.find(p => p.id === personId);
+                                      return person ? (
+                                        <div 
+                                          key={personId}
+                                          className={`w-5 h-5 rounded-full ${person.color} flex items-center justify-center text-xs border border-white overflow-hidden`}
+                                          title={`${person.name} ${person.lastName}`}
+                                        >
+                                          {person.name.charAt(0)}{person.lastName.charAt(0)}
+                                        </div>
+                                      ) : null;
+                                    })}
+                                  </div>
+                                )}
+                                <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    deleteEvent(event.id);
+                                  }}
+                                  className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+                            {eventsForDay.length === 0 && (
+                              <div className="text-center text-gray-400 text-xs p-2">
+                                + Añadir evento
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Lista de próximas publicaciones */}
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h3 className="text-lg font-semibold mb-4">Próximas Publicaciones</h3>
+                <div className="space-y-4">
+                  {events
+                    .filter(event => !event.isRecurring) // Excluir eventos de grabación recurrentes
+                    .sort((a, b) => a.date.getTime() - b.date.getTime())
+                    .slice(0, 5)
+                    .map(event => (
+                      <div key={event.id} className="flex items-center p-3 border rounded-lg">
+                        <div className={`w-4 h-4 rounded-full ${event.color} mr-3`}></div>
+                        <div className="flex-1">
+                          <div className="font-semibold">{event.title}</div>
+                          <div className="text-sm text-gray-500">
+                            {format(event.date, 'dd/MM/yyyy')} - {event.time} - {event.platform}
+                          </div>
+                          {event.people && event.people.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {event.people.map(personId => {
+                                const person = people.find(p => p.id === personId);
+                                return person ? (
+                                  <span 
+                                    key={personId}
+                                    className={`px-2 py-1 rounded-full text-xs ${person.color} text-white`}
+                                  >
+                                    {person.name} {person.lastName}
+                                  </span>
+                                ) : null;
+                              })}
+                            </div>
+                          )}
+                        </div>
+                        <button 
+                          onClick={() => deleteEvent(event.id)}
+                          className="text-gray-400 hover:text-red-500"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  
+                  {/* Si no hay eventos próximos */}
+                  {events.filter(event => !event.isRecurring).length === 0 && (
+                    <div className="text-center py-6 text-gray-500">
+                      No hay eventos próximos programados.
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Resumen */}
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h3 className="text-lg font-semibold mb-4">Resumen</h3>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span>Total eventos</span>
+                      <span className="font-bold text-lg">{events.length}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                      <span>Grabaciones</span>
+                      <span className="font-bold text-lg">
+                        {events.filter(e => e.isRecurring).length}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <h4 className="font-medium">Por plataforma</h4>
+                  <div className="space-y-2">
+                    {platforms.map(platform => {
+                      const count = events.filter(e => e.platform === platform.name).length;
+                      return (
+                        <div key={platform.name} className="flex items-center justify-between p-2 border-b">
+                          <div className="flex items-center">
+                            <div className={`w-3 h-3 rounded-full ${platform.color} mr-2`}></div>
+                            <span>{platform.name}</span>
+                          </div>
+                          <div className="font-semibold">{count}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <h4 className="font-medium">Por persona</h4>
+                  <div className="space-y-2">
+                    {people.map(person => {
+                      const count = events.filter(e => e.people?.includes(person.id)).length;
+                      return (
+                        <div key={person.id} className="flex items-center justify-between p-2 border-b">
+                          <div className="flex items-center">
+                            <div className={`w-5 h-5 rounded-full ${person.color} flex items-center justify-center text-xs text-white`}>
+                              {person.name.charAt(0)}{person.lastName.charAt(0)}
+                            </div>
+                            <span className="ml-2">{person.name} {person.lastName}</span>
+                          </div>
+                          <div className="font-semibold">{count}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </main>
-      </div>
+          </main>
+        </div>
 
-      {/* Modal para crear/editar evento */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md" onClick={e => e.stopPropagation()}>
-            <div className="p-6">
-              <h3 className="text-xl font-semibold mb-4">
-                {isEditing ? 'Editar Evento' : 'Crear Nuevo Evento'}
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Título</label>
-                  <input 
-                    type="text" 
-                    name="title"
-                    value={newEvent.title}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Título del evento"
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
+        {/* Modal para crear/editar evento */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-md" onClick={e => e.stopPropagation()}>
+              <div className="p-6">
+                <h3 className="text-xl font-semibold mb-4">
+                  {isEditing ? 'Editar Evento' : 'Crear Nuevo Evento'}
+                </h3>
+                <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1">Fecha</label>
-                    <div className="text-gray-700 p-2 bg-gray-100 rounded">
-                      {selectedDay ? format(selectedDay, 'dd/MM/yyyy') : ''}
+                    <label className="block text-sm font-medium mb-1">Título</label>
+                    <input 
+                      type="text" 
+                      name="title"
+                      value={newEvent.title}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Título del evento"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Fecha</label>
+                      <div className="text-gray-700 p-2 bg-gray-100 rounded">
+                        {selectedDay ? format(selectedDay, 'dd/MM/yyyy') : ''}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Hora inicio</label>
+                      <input 
+                        type="time" 
+                        name="time"
+                        value={newEvent.time}
+                        onChange={handleInputChange}
+                        className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Hora fin (opcional)</label>
+                      <input 
+                        type="time" 
+                        name="endTime"
+                        value={newEvent.endTime || ''}
+                        onChange={handleInputChange}
+                        className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Tipo de Contenido</label>
+                      <select 
+                        name="contentType"
+                        value={newEvent.contentType || ''}
+                        onChange={handleInputChange}
+                        className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        {contentTypes.map(type => (
+                          <option key={type} value={type}>
+                            {type}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium mb-1">Hora inicio</label>
-                    <input 
-                      type="time" 
-                      name="time"
-                      value={newEvent.time}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Hora fin (opcional)</label>
-                    <input 
-                      type="time" 
-                      name="endTime"
-                      value={newEvent.endTime || ''}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Tipo de Contenido</label>
+                    <label className="block text-sm font-medium mb-1">Plataforma (para publicaciones)</label>
                     <select 
-                      name="contentType"
-                      value={newEvent.contentType || ''}
+                      name="platform"
+                      value={newEvent.platform || ''}
                       onChange={handleInputChange}
                       className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      {contentTypes.map(type => (
-                        <option key={type} value={type}>
-                          {type}
+                      <option value="">Ninguna</option>
+                      {platforms.map(platform => (
+                        <option key={platform.name} value={platform.name}>
+                          {platform.name}
                         </option>
                       ))}
                     </select>
                   </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-1">Plataforma (para publicaciones)</label>
-                  <select 
-                    name="platform"
-                    value={newEvent.platform || ''}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Ninguna</option>
-                    {platforms.map(platform => (
-                      <option key={platform.name} value={platform.name}>
-                        {platform.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-1">Descripción</label>
-                  <textarea 
-                    name="description"
-                    value={newEvent.description}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows={3}
-                    placeholder="Descripción del evento"
-                  ></textarea>
-                </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Descripción</label>
+                    <textarea 
+                      name="description"
+                      value={newEvent.description}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      placeholder="Descripción del evento"
+                    ></textarea>
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-1">Ubicación (opcional)</label>
-                  <input 
-                    type="text" 
-                    name="location"
-                    value={newEvent.location || ''}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Dirección o lugar del evento"
-                  />
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Ubicación (opcional)</label>
+                    <input 
+                      type="text" 
+                      name="location"
+                      value={newEvent.location || ''}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Dirección o lugar del evento"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-1">Personas</label>
-                  <div className="grid grid-cols-2 gap-2 mt-1">
-                    {people.map(person => (
-                      <div 
-                        key={person.id}
-                        className={`flex items-center space-x-2 p-2 rounded cursor-pointer
-                          ${newEvent.people?.includes(person.id) 
-                            ? `${person.color} text-white` 
-                            : 'bg-gray-100'}`}
-                        onClick={() => handlePersonToggle(person.id)}
-                      >
-                        <input 
-                          type="checkbox" 
-                          checked={newEvent.people?.includes(person.id) || false}
-                          onChange={() => handlePersonToggle(person.id)}
-                          className="h-4 w-4"
-                        />
-                        <div className="flex items-center">
-                          <div className="w-5 h-5 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-xs mr-1">
-                            {person.name.charAt(0)}{person.lastName.charAt(0)}
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Personas</label>
+                    <div className="grid grid-cols-2 gap-2 mt-1">
+                      {people.map(person => (
+                        <div 
+                          key={person.id}
+                          className={`flex items-center space-x-2 p-2 rounded cursor-pointer
+                            ${newEvent.people?.includes(person.id) 
+                              ? `${person.color} text-white` 
+                              : 'bg-gray-100'}`}
+                          onClick={() => handlePersonToggle(person.id)}
+                        >
+                          <input 
+                            type="checkbox" 
+                            checked={newEvent.people?.includes(person.id) || false}
+                            onChange={() => handlePersonToggle(person.id)}
+                            className="h-4 w-4"
+                          />
+                          <div className="flex items-center">
+                            <div className="w-5 h-5 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-xs mr-1">
+                              {person.name.charAt(0)}{person.lastName.charAt(0)}
+                            </div>
+                            <span>{person.name} {person.lastName}</span>
                           </div>
-                          <span>{person.name} {person.lastName}</span>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="flex justify-end space-x-3 mt-6">
-                <button 
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border rounded hover:bg-gray-100"
-                >
-                  Cancelar
-                </button>
-                <button 
-                  onClick={handleSaveEvent}
-                  className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-800"
-                  disabled={!newEvent.title}
-                >
-                  Guardar
-                </button>
+                
+                <div className="flex justify-end space-x-3 mt-6">
+                  <button 
+                    onClick={() => setShowModal(false)}
+                    className="px-4 py-2 border rounded hover:bg-gray-100"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    onClick={handleSaveEvent}
+                    className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-800"
+                    disabled={!newEvent.title}
+                  >
+                    Guardar
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </AuthGuard>
   );
 } 

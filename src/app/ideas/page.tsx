@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
+import AuthGuard from '@/components/AuthGuard';
 
 interface Idea {
   id: string;
@@ -242,289 +243,291 @@ export default function IdeasPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <Sidebar />
-      
-      <div className="flex-1">
-        <header className="bg-blue-900 text-white p-4">
-          <div className="container mx-auto flex justify-between items-center">
-            <h1 className="text-2xl font-bold">Ideas para Contenido</h1>
-            <button 
-              onClick={() => handleOpenModal()}
-              className="bg-white text-blue-900 px-4 py-2 rounded-lg hover:bg-gray-100"
-            >
-              + Nueva Idea
-            </button>
-          </div>
-        </header>
+    <AuthGuard>
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar />
+        
+        <div className="flex-1">
+          <header className="bg-blue-900 text-white p-4">
+            <div className="container mx-auto flex justify-between items-center">
+              <h1 className="text-2xl font-bold">Ideas para Contenido</h1>
+              <button 
+                onClick={() => handleOpenModal()}
+                className="bg-white text-blue-900 px-4 py-2 rounded-lg hover:bg-gray-100"
+              >
+                + Nueva Idea
+              </button>
+            </div>
+          </header>
 
-        <main className="container mx-auto p-6">
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-              <h2 className="text-xl font-semibold">Todas las Ideas</h2>
-              
-              <div className="flex flex-wrap gap-4">
-                <select
-                  className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={filterPlatform || ''}
-                  onChange={(e) => setFilterPlatform(e.target.value || null)}
-                >
-                  <option value="">Todas las plataformas</option>
-                  {platforms.map(platform => (
-                    <option key={platform} value={platform}>{platform}</option>
-                  ))}
-                </select>
+          <main className="container mx-auto p-6">
+            <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <h2 className="text-xl font-semibold">Todas las Ideas</h2>
                 
-                <select
-                  className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={filterStatus || ''}
-                  onChange={(e) => setFilterStatus(e.target.value || null)}
-                >
-                  <option value="">Todos los estados</option>
-                  {statuses.map(status => (
-                    <option key={status.value} value={status.value}>{status.label}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {filteredIdeas.length > 0 ? (
-                filteredIdeas.map(idea => (
-                  <div key={idea.id} className="border rounded-lg overflow-hidden group hover:shadow-md transition-shadow">
-                    <div className={`p-4 ${
-                      idea.platform === 'Instagram' ? 'bg-pink-50' : 
-                      idea.platform === 'TikTok' ? 'bg-black text-white' :
-                      idea.platform === 'YouTube' ? 'bg-red-50' :
-                      idea.platform === 'LinkedIn' ? 'bg-blue-50' : 'bg-green-50'
-                    }`}>
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-bold text-lg">{idea.title}</h3>
-                          <p className="text-sm">{idea.platform} - {getStatusBadge(idea.status)}</p>
-                        </div>
-                        <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => handleOpenModal(idea)}
-                            className="text-blue-600 hover:text-blue-800"
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            onClick={() => handleDeleteIdea(idea.id)}
-                            className="text-red-600 hover:text-red-800"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="p-4">
-                      <p className="text-gray-700 mb-4">{idea.description}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {idea.tags.map(tag => (
-                          <span key={tag} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
-                      <p className="text-xs text-gray-500 mt-4">
-                        Creado: {idea.createdAt.toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="col-span-2 text-center py-10 text-gray-500">
-                  No hay ideas que coincidan con los filtros aplicados.
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-lg shadow-lg p-6 col-span-1 md:col-span-2">
-              <h3 className="text-lg font-semibold mb-4">Consejos para Reels virales</h3>
-              <ul className="space-y-3">
-                <li className="flex items-start">
-                  <span className="mr-2 bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center">1</span>
-                  <div>
-                    <p className="font-medium">Capta la atención en los primeros segundos</p>
-                    <p className="text-sm text-gray-600">Los primeros 3 segundos son cruciales para retener al espectador.</p>
-                  </div>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2 bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center">2</span>
-                  <div>
-                    <p className="font-medium">Usa música de tendencia</p>
-                    <p className="text-sm text-gray-600">La música popular puede ayudar a que tu contenido sea descubierto.</p>
-                  </div>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2 bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center">3</span>
-                  <div>
-                    <p className="font-medium">Mantén el contenido corto y dinámico</p>
-                    <p className="text-sm text-gray-600">Los reels de 15-30 segundos suelen tener mejor rendimiento.</p>
-                  </div>
-                </li>
-                <li className="flex items-start">
-                  <span className="mr-2 bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center">4</span>
-                  <div>
-                    <p className="font-medium">Incluye llamados a la acción</p>
-                    <p className="text-sm text-gray-600">Pide a tus seguidores que comenten o compartan.</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="text-lg font-semibold mb-4">Resumen</h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <span>Total de Ideas</span>
-                  <span className="font-bold text-lg">{ideas.length}</span>
-                </div>
-                {statuses.map(status => {
-                  const count = ideas.filter(idea => idea.status === status.value).length;
-                  return (
-                    <div key={status.value} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                      <span>{status.label}</span>
-                      <span className="font-bold text-lg">{count}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </main>
-      </div>
-
-      {/* Modal para crear/editar ideas */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md" onClick={e => e.stopPropagation()}>
-            <div className="p-6">
-              <h3 className="text-xl font-semibold mb-4">
-                {isEditing ? 'Editar Idea' : 'Nueva Idea de Contenido'}
-              </h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Título</label>
-                  <input 
-                    type="text" 
-                    name="title"
-                    value={currentIdea.title}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Título de la idea"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-1">Descripción</label>
-                  <textarea 
-                    name="description"
-                    value={currentIdea.description}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows={3}
-                    placeholder="Describe la idea en detalle"
-                  ></textarea>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-1">Plataforma</label>
-                  <select 
-                    name="platform"
-                    value={currentIdea.platform}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                <div className="flex flex-wrap gap-4">
+                  <select
+                    className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={filterPlatform || ''}
+                    onChange={(e) => setFilterPlatform(e.target.value || null)}
                   >
+                    <option value="">Todas las plataformas</option>
                     {platforms.map(platform => (
-                      <option key={platform} value={platform}>
-                        {platform}
-                      </option>
+                      <option key={platform} value={platform}>{platform}</option>
                     ))}
                   </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-1">Estado</label>
-                  <select 
-                    name="status"
-                    value={currentIdea.status}
-                    onChange={handleInputChange}
-                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  
+                  <select
+                    className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={filterStatus || ''}
+                    onChange={(e) => setFilterStatus(e.target.value || null)}
                   >
+                    <option value="">Todos los estados</option>
                     {statuses.map(status => (
-                      <option key={status.value} value={status.value}>
-                        {status.label}
-                      </option>
+                      <option key={status.value} value={status.value}>{status.label}</option>
                     ))}
                   </select>
                 </div>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {filteredIdeas.length > 0 ? (
+                  filteredIdeas.map(idea => (
+                    <div key={idea.id} className="border rounded-lg overflow-hidden group hover:shadow-md transition-shadow">
+                      <div className={`p-4 ${
+                        idea.platform === 'Instagram' ? 'bg-pink-50' : 
+                        idea.platform === 'TikTok' ? 'bg-black text-white' :
+                        idea.platform === 'YouTube' ? 'bg-red-50' :
+                        idea.platform === 'LinkedIn' ? 'bg-blue-50' : 'bg-green-50'
+                      }`}>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-bold text-lg">{idea.title}</h3>
+                            <p className="text-sm">{idea.platform} - {getStatusBadge(idea.status)}</p>
+                          </div>
+                          <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => handleOpenModal(idea)}
+                              className="text-blue-600 hover:text-blue-800"
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              onClick={() => handleDeleteIdea(idea.id)}
+                              className="text-red-600 hover:text-red-800"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        <p className="text-gray-700 mb-4">{idea.description}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {idea.tags.map(tag => (
+                            <span key={tag} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-4">
+                          Creado: {idea.createdAt.toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-2 text-center py-10 text-gray-500">
+                    No hay ideas que coincidan con los filtros aplicados.
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white rounded-lg shadow-lg p-6 col-span-1 md:col-span-2">
+                <h3 className="text-lg font-semibold mb-4">Consejos para Reels virales</h3>
+                <ul className="space-y-3">
+                  <li className="flex items-start">
+                    <span className="mr-2 bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center">1</span>
+                    <div>
+                      <p className="font-medium">Capta la atención en los primeros segundos</p>
+                      <p className="text-sm text-gray-600">Los primeros 3 segundos son cruciales para retener al espectador.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2 bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center">2</span>
+                    <div>
+                      <p className="font-medium">Usa música de tendencia</p>
+                      <p className="text-sm text-gray-600">La música popular puede ayudar a que tu contenido sea descubierto.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2 bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center">3</span>
+                    <div>
+                      <p className="font-medium">Mantén el contenido corto y dinámico</p>
+                      <p className="text-sm text-gray-600">Los reels de 15-30 segundos suelen tener mejor rendimiento.</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="mr-2 bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center">4</span>
+                    <div>
+                      <p className="font-medium">Incluye llamados a la acción</p>
+                      <p className="text-sm text-gray-600">Pide a tus seguidores que comenten o compartan.</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <h3 className="text-lg font-semibold mb-4">Resumen</h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                    <span>Total de Ideas</span>
+                    <span className="font-bold text-lg">{ideas.length}</span>
+                  </div>
+                  {statuses.map(status => {
+                    const count = ideas.filter(idea => idea.status === status.value).length;
+                    return (
+                      <div key={status.value} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <span>{status.label}</span>
+                        <span className="font-bold text-lg">{count}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+
+        {/* Modal para crear/editar ideas */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-md" onClick={e => e.stopPropagation()}>
+              <div className="p-6">
+                <h3 className="text-xl font-semibold mb-4">
+                  {isEditing ? 'Editar Idea' : 'Nueva Idea de Contenido'}
+                </h3>
                 
-                <div>
-                  <label className="block text-sm font-medium mb-1">Tags</label>
-                  <div className="flex space-x-2">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Título</label>
                     <input 
                       type="text" 
-                      value={newTag}
-                      onChange={(e) => setNewTag(e.target.value)}
-                      className="flex-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Añadir tag"
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleTagAdd())}
+                      name="title"
+                      value={currentIdea.title}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Título de la idea"
+                      required
                     />
-                    <button 
-                      type="button"
-                      onClick={handleTagAdd}
-                      className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-800"
-                    >
-                      Añadir
-                    </button>
                   </div>
                   
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {currentIdea.tags?.map(tag => (
-                      <span 
-                        key={tag} 
-                        className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full flex items-center"
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Descripción</label>
+                    <textarea 
+                      name="description"
+                      value={currentIdea.description}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      placeholder="Describe la idea en detalle"
+                    ></textarea>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Plataforma</label>
+                    <select 
+                      name="platform"
+                      value={currentIdea.platform}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      {platforms.map(platform => (
+                        <option key={platform} value={platform}>
+                          {platform}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Estado</label>
+                    <select 
+                      name="status"
+                      value={currentIdea.status}
+                      onChange={handleInputChange}
+                      className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      {statuses.map(status => (
+                        <option key={status.value} value={status.value}>
+                          {status.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Tags</label>
+                    <div className="flex space-x-2">
+                      <input 
+                        type="text" 
+                        value={newTag}
+                        onChange={(e) => setNewTag(e.target.value)}
+                        className="flex-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Añadir tag"
+                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleTagAdd())}
+                      />
+                      <button 
+                        type="button"
+                        onClick={handleTagAdd}
+                        className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-800"
                       >
-                        #{tag}
-                        <button 
-                          type="button"
-                          onClick={() => handleTagRemove(tag)}
-                          className="ml-1 text-gray-500 hover:text-red-500"
+                        Añadir
+                      </button>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {currentIdea.tags?.map(tag => (
+                        <span 
+                          key={tag} 
+                          className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full flex items-center"
                         >
-                          ✕
-                        </button>
-                      </span>
-                    ))}
+                          #{tag}
+                          <button 
+                            type="button"
+                            onClick={() => handleTagRemove(tag)}
+                            className="ml-1 text-gray-500 hover:text-red-500"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="flex justify-end space-x-3 mt-6">
-                <button 
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border rounded hover:bg-gray-100"
-                >
-                  Cancelar
-                </button>
-                <button 
-                  onClick={handleSaveIdea}
-                  className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-800"
-                  disabled={!currentIdea.title}
-                >
-                  Guardar
-                </button>
+                
+                <div className="flex justify-end space-x-3 mt-6">
+                  <button 
+                    onClick={() => setShowModal(false)}
+                    className="px-4 py-2 border rounded hover:bg-gray-100"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    onClick={handleSaveIdea}
+                    className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-800"
+                    disabled={!currentIdea.title}
+                  >
+                    Guardar
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </AuthGuard>
   );
 } 
