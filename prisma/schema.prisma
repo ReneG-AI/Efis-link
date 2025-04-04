@@ -58,4 +58,36 @@ model SocialAccount {
   username     String
   followers    Int      @default(0)
   lastUpdated  DateTime @default(now())
+}
+
+model CalendarEvent {
+  id          String    @id @default(cuid())
+  title       String
+  date        DateTime
+  time        String
+  endTime     String?
+  platform    String?
+  contentType String?
+  description String
+  color       String
+  location    String?
+  isRecurring Boolean   @default(false)
+  people      String[]  // IDs de las personas como array de strings
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      Int?
+  user        User?     @relation(fields: [userId], references: [id])
+}
+
+model Idea {
+  id          String    @id @default(cuid())
+  title       String
+  description String
+  platform    String
+  tags        String[]  // Tags como array de strings
+  status      String    // "pending", "in-progress", "completed"
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      Int?
+  user        User?     @relation(fields: [userId], references: [id])
 } 

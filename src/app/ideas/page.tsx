@@ -14,57 +14,59 @@ interface Idea {
 }
 
 export default function IdeasPage() {
-  const [ideas, setIdeas] = useState<Idea[]>(() => {
-    if (typeof window !== 'undefined') {
-      const savedIdeas = localStorage.getItem('content-ideas');
-      if (savedIdeas) {
-        try {
-          const parsedIdeas = JSON.parse(savedIdeas, (key, value) => {
-            if (key === 'createdAt') {
-              return new Date(value);
-            }
-            return value;
-          });
-          return parsedIdeas;
-        } catch (error) {
-          console.error('Error al cargar ideas guardadas:', error);
-        }
-      }
-    }
-    
-    return [
-      {
-        id: '1',
-        title: 'Tendencias de marketing para podcast',
-        description: 'Recopilar las últimas tendencias de marketing digital específicas para podcasts y crear un reel explicativo de 30 segundos.',
-        platform: 'Instagram',
-        tags: ['marketing', 'tendencias', 'podcast'],
-        status: 'pending',
-        createdAt: new Date()
-      },
-      {
-        id: '2',
-        title: 'Entrevista con experto en SEO',
-        description: 'Fragmentos cortos de la entrevista con Pablo sobre SEO para redes sociales, destacando 3 tips clave.',
-        platform: 'Instagram',
-        tags: ['seo', 'entrevista', 'consejos'],
-        status: 'in-progress',
-        createdAt: new Date(Date.now() - 86400000)
-      },
-      {
-        id: '3',
-        title: 'Behind the scenes de la grabación',
-        description: 'Momentos divertidos y preparación antes de grabar el podcast, mostrando el equipo y la dinámica del equipo.',
-        platform: 'TikTok',
-        tags: ['bts', 'equipo', 'podcast'],
-        status: 'completed',
-        createdAt: new Date(Date.now() - 172800000)
-      }
-    ];
-  });
+  const [ideas, setIdeas] = useState<Idea[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    const fetchIdeas = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/api/ideas');
+        
+        if (!response.ok) {
+          throw new Error('Error al cargar ideas');
+        }
+        
+        let data = await response.json();
+        
+        data = data.map((idea: any) => ({
+          ...idea,
+          createdAt: new Date(idea.createdAt)
+        }));
+        
+        setIdeas(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching ideas:', err);
+        setError('No se pudieron cargar las ideas. Por favor, intenta de nuevo más tarde.');
+        
+        if (typeof window !== 'undefined') {
+          const savedIdeas = localStorage.getItem('content-ideas');
+          if (savedIdeas) {
+            try {
+              const parsedIdeas = JSON.parse(savedIdeas, (key, value) => {
+                if (key === 'createdAt') {
+                  return new Date(value);
+                }
+                return value;
+              });
+              setIdeas(parsedIdeas);
+            } catch (error) {
+              console.error('Error al cargar ideas guardadas:', error);
+            }
+          }
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchIdeas();
+  }, []);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined' && ideas.length > 0) {
       localStorage.setItem('content-ideas', JSON.stringify(ideas));
     }
   }, [ideas]);
@@ -123,30 +125,97 @@ export default function IdeasPage() {
     });
   };
 
-  const handleSaveIdea = () => {
+  const handleSaveIdea = async () => {
     if (isEditing) {
-      setIdeas(ideas.map(idea => 
-        idea.id === currentIdea.id 
-          ? { ...idea, ...currentIdea, tags: currentIdea.tags || [] } as Idea 
-          : idea
-      ));
+      try {
+        const response = await fetch(`/api/ideas/${currentIdea.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(currentIdea),
+        });
+        
+        if (!response.ok) {
+          throw new Error('Error al actualizar la idea');
+        }
+        
+        const updatedIdea = await response.json();
+        
+        setIdeas(ideas.map(idea => 
+          idea.id === currentIdea.id 
+            ? { ...updatedIdea, createdAt: new Date(updatedIdea.createdAt) } as Idea 
+            : idea
+        ));
+      } catch (error) {
+        console.error('Error updating idea:', error);
+        alert('No se pudo actualizar la idea. Por favor, intenta de nuevo.');
+        
+        setIdeas(ideas.map(idea => 
+          idea.id === currentIdea.id 
+            ? { ...idea, ...currentIdea, tags: currentIdea.tags || [] } as Idea 
+            : idea
+        ));
+      }
     } else {
-      const newIdea: Idea = {
-        id: Math.random().toString(36).substring(2, 9),
-        title: currentIdea.title || '',
-        description: currentIdea.description || '',
-        platform: currentIdea.platform || 'Instagram',
-        tags: currentIdea.tags || [],
-        status: currentIdea.status as 'pending' | 'in-progress' | 'completed',
-        createdAt: new Date()
-      };
-      setIdeas([newIdea, ...ideas]);
+      try {
+        const response = await fetch('/api/ideas', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            title: currentIdea.title,
+            description: currentIdea.description,
+            platform: currentIdea.platform,
+            tags: currentIdea.tags || [],
+            status: currentIdea.status
+          }),
+        });
+        
+        if (!response.ok) {
+          throw new Error('Error al crear la idea');
+        }
+        
+        const createdIdea = await response.json();
+        
+        setIdeas([{ ...createdIdea, createdAt: new Date(createdIdea.createdAt) } as Idea, ...ideas]);
+      } catch (error) {
+        console.error('Error creating idea:', error);
+        alert('No se pudo crear la idea. Por favor, intenta de nuevo.');
+        
+        const newIdea: Idea = {
+          id: Math.random().toString(36).substring(2, 9),
+          title: currentIdea.title || '',
+          description: currentIdea.description || '',
+          platform: currentIdea.platform || 'Instagram',
+          tags: currentIdea.tags || [],
+          status: currentIdea.status as 'pending' | 'in-progress' | 'completed',
+          createdAt: new Date()
+        };
+        setIdeas([newIdea, ...ideas]);
+      }
     }
     setShowModal(false);
   };
 
-  const handleDeleteIdea = (id: string) => {
-    setIdeas(ideas.filter(idea => idea.id !== id));
+  const handleDeleteIdea = async (id: string) => {
+    try {
+      const response = await fetch(`/api/ideas/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Error al eliminar la idea');
+      }
+      
+      setIdeas(ideas.filter(idea => idea.id !== id));
+    } catch (error) {
+      console.error('Error deleting idea:', error);
+      alert('No se pudo eliminar la idea. Por favor, intenta de nuevo.');
+      
+      setIdeas(ideas.filter(idea => idea.id !== id));
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

@@ -104,64 +104,63 @@ export default function CalendarPage() {
   ];
 
   // Estado de eventos
-  const [events, setEvents] = useState<Event[]>(() => {
-    // Intentar cargar eventos desde localStorage
-    if (typeof window !== 'undefined') {
-      const savedEvents = localStorage.getItem('calendar-events');
-      if (savedEvents) {
-        try {
-          // Convertir las fechas de string a objetos Date
-          const parsedEvents = JSON.parse(savedEvents, (key, value) => {
-            if (key === 'date') {
-              return new Date(value);
-            }
-            return value;
-          });
-          return parsedEvents;
-        } catch (error) {
-          console.error('Error al cargar eventos guardados:', error);
-        }
-      }
-    }
-    
-    // Eventos por defecto si no hay datos guardados
-    return [
-      {
-        id: '1',
-        title: 'Publicación Instagram',
-        date: new Date(),
-        time: '20:00',
-        platform: 'Instagram',
-        contentType: 'Reel',
-        description: 'Resumen del podcast sobre desarrollo personal',
-        color: 'bg-pink-500'
-      },
-      {
-        id: '2',
-        title: 'Publicación LinkedIn',
-        date: addDays(new Date(), 1),
-        time: '20:00',
-        platform: 'LinkedIn',
-        contentType: 'Post',
-        description: 'Artículo sobre liderazgo empresarial',
-        color: 'bg-blue-500'
-      },
-      {
-        id: '3',
-        title: 'Publicación YouTube',
-        date: addDays(new Date(), 2),
-        time: '20:00',
-        platform: 'YouTube',
-        contentType: 'Video',
-        description: 'Entrevista completa con experto en marketing',
-        color: 'bg-red-500'
-      }
-    ];
-  });
+  const [events, setEvents] = useState<Event[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
-  // Guardar eventos en localStorage cuando cambien
+  // Cargar eventos desde el servidor
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    const fetchEvents = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/api/calendar-events');
+        
+        if (!response.ok) {
+          throw new Error('Error al cargar eventos');
+        }
+        
+        let data = await response.json();
+        
+        // Convertir las fechas de string a Date
+        data = data.map((event: any) => ({
+          ...event,
+          date: new Date(event.date)
+        }));
+        
+        setEvents(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching events:', err);
+        setError('No se pudieron cargar los eventos. Por favor, intenta de nuevo más tarde.');
+        
+        // Cargar eventos de respaldo desde localStorage
+        if (typeof window !== 'undefined') {
+          const savedEvents = localStorage.getItem('calendar-events');
+          if (savedEvents) {
+            try {
+              const parsedEvents = JSON.parse(savedEvents, (key, value) => {
+                if (key === 'date') {
+                  return new Date(value);
+                }
+                return value;
+              });
+              setEvents(parsedEvents);
+            } catch (error) {
+              console.error('Error al cargar eventos guardados:', error);
+            }
+          }
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchEvents();
+  }, []);
+  
+  // Guardar eventos en localStorage como respaldo
+  useEffect(() => {
+    if (typeof window !== 'undefined' && events.length > 0) {
       localStorage.setItem('calendar-events', JSON.stringify(events));
     }
   }, [events]);
@@ -285,24 +284,79 @@ export default function CalendarPage() {
     });
   };
 
-  const handleSaveEvent = () => {
+  // Función para crear un nuevo evento
+  const handleSaveEvent = async () => {
     if (isEditing && selectedEvent) {
       // Actualizar evento existente
-      setEvents(prevEvents => 
-        prevEvents.map(event => 
-          event.id === selectedEvent.id 
-            ? { ...event, ...newEvent, id: event.id } 
-            : event
-        )
-      );
+      try {
+        const response = await fetch(`/api/calendar-events/${selectedEvent.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...newEvent,
+            id: selectedEvent.id
+          }),
+        });
+        
+        if (!response.ok) {
+          throw new Error('Error al actualizar el evento');
+        }
+        
+        const updatedEvent = await response.json();
+        
+        // Actualizar estado local
+        setEvents(prevEvents => 
+          prevEvents.map(event => 
+            event.id === selectedEvent.id 
+              ? { ...updatedEvent, date: new Date(updatedEvent.date) } 
+              : event
+          )
+        );
+      } catch (error) {
+        console.error('Error updating event:', error);
+        alert('No se pudo actualizar el evento. Por favor, intenta de nuevo.');
+        
+        // Actualizar de forma local si hay un error
+        setEvents(prevEvents => 
+          prevEvents.map(event => 
+            event.id === selectedEvent.id 
+              ? { ...event, ...newEvent, id: event.id } 
+              : event
+          )
+        );
+      }
     } else {
       // Crear nuevo evento
-      const eventToSave = {
-        id: Math.random().toString(36).substring(2, 9),
-        ...newEvent
-      };
-      
-      setEvents([...events, eventToSave]);
+      try {
+        const response = await fetch('/api/calendar-events', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newEvent),
+        });
+        
+        if (!response.ok) {
+          throw new Error('Error al crear el evento');
+        }
+        
+        const createdEvent = await response.json();
+        
+        // Añadir al estado local
+        setEvents([...events, { ...createdEvent, date: new Date(createdEvent.date) }]);
+      } catch (error) {
+        console.error('Error creating event:', error);
+        alert('No se pudo crear el evento. Por favor, intenta de nuevo.');
+        
+        // Crear de forma local si hay un error
+        const eventToSave = {
+          id: Math.random().toString(36).substring(2, 9),
+          ...newEvent
+        };
+        setEvents([...events, eventToSave]);
+      }
     }
     
     setShowModal(false);
@@ -324,8 +378,26 @@ export default function CalendarPage() {
     setIsEditing(false);
   };
 
-  const deleteEvent = (id: string) => {
-    setEvents(events.filter(event => event.id !== id));
+  // Función para eliminar un evento
+  const deleteEvent = async (id: string) => {
+    try {
+      const response = await fetch(`/api/calendar-events/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Error al eliminar el evento');
+      }
+      
+      // Actualizar estado local
+      setEvents(events.filter(event => event.id !== id));
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      alert('No se pudo eliminar el evento. Por favor, intenta de nuevo.');
+      
+      // Eliminar de forma local si hay un error
+      setEvents(events.filter(event => event.id !== id));
+    }
   };
 
   const getEventsForDay = (day: Date) => {
