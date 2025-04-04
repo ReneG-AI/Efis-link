@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
-import { format, addDays, startOfWeek, isSameDay, parseISO, getDay } from 'date-fns';
+import { format, addDays, startOfWeek, endOfWeek, isSameDay, parseISO, getDay, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, addYears, subYears, startOfYear, endOfYear, addWeeks, endOfWeeks } from 'date-fns';
 import { es } from 'date-fns/locale';
 
+// Tipos
 interface Person {
   id: string;
   name: string;
+  lastName: string;
   color: string;
 }
 
@@ -28,11 +30,40 @@ interface Event {
   people?: string[];
 }
 
+// Iconos de componentes
+const CalendarIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+  </svg>
+);
+
+const ExportIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+  </svg>
+);
+
+const DownloadIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+  </svg>
+);
+
+const FilterIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+  </svg>
+);
+
 export default function CalendarPage() {
   const router = useRouter();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [filterPerson, setFilterPerson] = useState<string | null>(null);
   const [filterPlatform, setFilterPlatform] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'week' | 'month' | 'year'>('week');
+  const [showDateFilter, setShowDateFilter] = useState(false);
+  const [startDate, setStartDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
+  const [endDate, setEndDate] = useState<string>(format(addDays(new Date(), 7), 'yyyy-MM-dd'));
   const [showModal, setShowModal] = useState(false);
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -40,10 +71,10 @@ export default function CalendarPage() {
   
   // Lista de personas del equipo
   const people: Person[] = [
-    { id: '1', name: 'René Garcia', color: 'bg-purple-500' },
-    { id: '2', name: 'Joan Alonso', color: 'bg-yellow-500' },
-    { id: '3', name: 'Ayub Allach', color: 'bg-green-500' },
-    { id: '4', name: 'Albert Llamas', color: 'bg-blue-500' }
+    { id: '1', name: 'René', lastName: 'Garcia', color: 'bg-purple-500' },
+    { id: '2', name: 'Joan', lastName: 'Alonso', color: 'bg-yellow-500' },
+    { id: '3', name: 'Ayub', lastName: 'Allach', color: 'bg-green-500' },
+    { id: '4', name: 'Albert', lastName: 'Llamas', color: 'bg-blue-500' }
   ];
 
   // Evento de grabación base
@@ -399,6 +430,119 @@ export default function CalendarPage() {
     document.body.removeChild(link);
   };
 
+  // Funciones para cambiar el modo de visualización
+  const handleViewModeChange = (mode: 'week' | 'month' | 'year') => {
+    setViewMode(mode);
+    
+    // Resetear filtros de fechas específicas
+    setShowDateFilter(false);
+    
+    // Ajustar la fecha actual según el modo
+    const today = new Date();
+    switch (mode) {
+      case 'week':
+        setCurrentDate(today);
+        break;
+      case 'month':
+        setCurrentDate(startOfMonth(today));
+        break;
+      case 'year':
+        setCurrentDate(startOfYear(today));
+        break;
+    }
+  };
+
+  // Manejar navegación en diferentes modos
+  const handlePrevious = () => {
+    switch (viewMode) {
+      case 'week':
+        setCurrentDate(addDays(currentDate, -7));
+        break;
+      case 'month':
+        setCurrentDate(subMonths(currentDate, 1));
+        break;
+      case 'year':
+        setCurrentDate(subYears(currentDate, 1));
+        break;
+    }
+  };
+
+  const handleNext = () => {
+    switch (viewMode) {
+      case 'week':
+        setCurrentDate(addDays(currentDate, 7));
+        break;
+      case 'month':
+        setCurrentDate(addMonths(currentDate, 1));
+        break;
+      case 'year':
+        setCurrentDate(addYears(currentDate, 1));
+        break;
+    }
+  };
+
+  // Manejar filtro de fechas específicas
+  const handleDateFilterToggle = () => {
+    setShowDateFilter(!showDateFilter);
+    if (showDateFilter) {
+      // Si estamos ocultando el filtro, volver al modo normal
+      handleViewModeChange(viewMode);
+    }
+  };
+
+  const handleDateFilterApply = () => {
+    if (startDate && endDate) {
+      const start = parseISO(startDate);
+      const end = parseISO(endDate);
+      
+      if (start > end) {
+        alert('La fecha de inicio debe ser anterior a la fecha de fin.');
+        return;
+      }
+      
+      setCurrentDate(start);
+      // No establecemos un modo específico, ya que estamos en modo personalizado
+    }
+  };
+
+  // Calcular días a mostrar según el modo de visualización
+  const getDaysToShow = () => {
+    if (showDateFilter && startDate && endDate) {
+      const start = parseISO(startDate);
+      const end = parseISO(endDate);
+      
+      if (start > end) {
+        return []; // Fechas inválidas
+      }
+      
+      return eachDayOfInterval({ start, end });
+    }
+    
+    switch (viewMode) {
+      case 'week':
+        const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+        return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+      
+      case 'month':
+        const monthStart = startOfMonth(currentDate);
+        const monthEnd = endOfMonth(currentDate);
+        const firstDay = startOfWeek(monthStart, { weekStartsOn: 1 });
+        const lastDay = addDays(endOfWeeks(monthEnd, { weekStartsOn: 1 }), 1);
+        return eachDayOfInterval({ start: firstDay, end: lastDay });
+      
+      case 'year':
+        const yearStart = startOfYear(currentDate);
+        const yearEnd = endOfYear(currentDate);
+        return eachDayOfInterval({ 
+          start: startOfMonth(yearStart), 
+          end: endOfMonth(yearEnd) 
+        }).filter(date => date.getDate() === 1); // Solo mostrar el primer día de cada mes
+      
+      default:
+        return [];
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
@@ -406,7 +550,10 @@ export default function CalendarPage() {
       <div className="flex-1">
         <header className="bg-blue-900 text-white p-4">
           <div className="container mx-auto flex justify-between items-center">
-            <h1 className="text-2xl font-bold">Calendario de Publicaciones</h1>
+            <div className="flex items-center">
+              <CalendarIcon />
+              <h1 className="text-2xl font-bold ml-2">Calendario de Publicaciones</h1>
+            </div>
             <div className="flex items-center space-x-4">
               <span>{format(currentDate, 'MMMM yyyy', { locale: es })}</span>
             </div>
@@ -415,23 +562,109 @@ export default function CalendarPage() {
 
         <main className="container mx-auto p-6">
           <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-            {/* Filtros y controles */}
+            {/* Controles de visualización */}
+            <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => handleViewModeChange('week')}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    viewMode === 'week' 
+                      ? 'bg-blue-900 text-white' 
+                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                  }`}
+                >
+                  Semana
+                </button>
+                <button 
+                  onClick={() => handleViewModeChange('month')}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    viewMode === 'month' 
+                      ? 'bg-blue-900 text-white' 
+                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                  }`}
+                >
+                  Mes
+                </button>
+                <button 
+                  onClick={() => handleViewModeChange('year')}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    viewMode === 'year' 
+                      ? 'bg-blue-900 text-white' 
+                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                  }`}
+                >
+                  Año
+                </button>
+                <button 
+                  onClick={handleDateFilterToggle}
+                  className={`px-4 py-2 rounded-lg flex items-center transition-colors ${
+                    showDateFilter 
+                      ? 'bg-blue-900 text-white' 
+                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                  }`}
+                >
+                  <FilterIcon />
+                  <span className="ml-1">Fechas</span>
+                </button>
+              </div>
+
+              {showDateFilter && (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center">
+                    <span className="mr-2">Desde:</span>
+                    <input 
+                      type="date" 
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="border rounded p-2"
+                    />
+                  </div>
+                  <div className="flex items-center">
+                    <span className="mr-2">Hasta:</span>
+                    <input 
+                      type="date" 
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="border rounded p-2"
+                    />
+                  </div>
+                  <button 
+                    onClick={handleDateFilterApply}
+                    className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
+                  >
+                    Aplicar
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Filtros y controles de navegación */}
             <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
               <div className="flex gap-4 flex-wrap md:flex-nowrap">
                 <button 
-                  onClick={handlePrevWeek}
+                  onClick={handlePrevious}
                   className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
                 >
-                  Semana Anterior
+                  {viewMode === 'week' ? 'Semana Anterior' : 
+                   viewMode === 'month' ? 'Mes Anterior' : 'Año Anterior'}
                 </button>
                 <h2 className="text-xl font-semibold whitespace-nowrap">
-                  {format(weekStart, 'dd')} - {format(addDays(weekStart, 6), 'dd')} de {format(weekStart, 'MMMM', { locale: es })}
+                  {viewMode === 'week' ? (
+                    <>
+                      {format(getDaysToShow()[0], 'dd')} - {format(getDaysToShow()[getDaysToShow().length - 1], 'dd')} de {format(getDaysToShow()[0], 'MMMM', { locale: es })}
+                    </>
+                  ) : viewMode === 'month' ? (
+                    format(currentDate, 'MMMM yyyy', { locale: es })
+                  ) : (
+                    format(currentDate, 'yyyy')
+                  )}
                 </h2>
                 <button 
-                  onClick={handleNextWeek}
+                  onClick={handleNext}
                   className="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800"
                 >
-                  Siguiente Semana
+                  {viewMode === 'week' ? 'Siguiente Semana' : 
+                   viewMode === 'month' ? 'Siguiente Mes' : 'Siguiente Año'}
                 </button>
               </div>
 
@@ -443,7 +676,7 @@ export default function CalendarPage() {
                 >
                   <option value="">Todas las personas</option>
                   {people.map(person => (
-                    <option key={person.id} value={person.id}>{person.name}</option>
+                    <option key={person.id} value={person.id}>{person.name} {person.lastName}</option>
                   ))}
                 </select>
 
@@ -464,85 +697,124 @@ export default function CalendarPage() {
                   onClick={exportToGoogleCalendar}
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
                 >
+                  <ExportIcon />
                   <span>Google Calendar</span>
                 </button>
                 <button 
                   onClick={exportToCSV}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
                 >
+                  <DownloadIcon />
                   <span>Exportar CSV</span>
                 </button>
               </div>
             </div>
 
-            {/* Calendario semanal */}
-            <div className="grid grid-cols-7 gap-4">
-              {weekDays.map((day, index) => (
-                <div key={index} className="border rounded-lg overflow-hidden">
-                  <div className={`p-2 ${isSameDay(day, new Date()) ? 'bg-blue-100 font-bold' : 'bg-gray-100'}`}>
-                    <div className="text-center">
-                      <div className="text-sm text-gray-500">
-                        {format(day, 'EEEE', { locale: es })}
-                      </div>
-                      <div className="text-lg">
-                        {format(day, 'd')}
-                      </div>
-                    </div>
-                  </div>
+            {/* Calendario según el modo de visualización */}
+            <div className={`grid ${
+              viewMode === 'week' ? 'grid-cols-7' : 
+              viewMode === 'month' ? 'grid-cols-7' : 
+              'grid-cols-3 md:grid-cols-4 lg:grid-cols-6'
+            } gap-2`}>
+              {getDaysToShow().map((day, index) => {
+                const isCurrentDay = isSameDay(day, new Date());
+                const eventsForDay = getEventsForDay(day);
+                
+                return (
                   <div 
-                    className="min-h-[200px] p-2 cursor-pointer"
-                    onClick={() => handleDayClick(day)}
+                    key={index} 
+                    className={`border rounded-lg overflow-hidden ${
+                      viewMode === 'year' ? 'h-28' : ''
+                    }`}
                   >
-                    {getEventsForDay(day).map(event => (
-                      <div 
-                        key={event.id} 
-                        className={`p-2 mb-2 rounded-lg ${event.color} text-white text-sm relative group`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEventClick(event);
-                        }}
-                      >
-                        <div className="font-bold">{event.title}</div>
-                        <div>
-                          {event.time} 
-                          {event.endTime && ` - ${event.endTime}`} 
-                          {event.platform && ` · ${event.platform}`}
-                        </div>
-                        {event.people && event.people.length > 0 && (
-                          <div className="flex -space-x-1 mt-1">
-                            {event.people.map(personId => {
-                              const person = people.find(p => p.id === personId);
-                              return person ? (
-                                <div 
-                                  key={personId}
-                                  className={`w-5 h-5 rounded-full ${person.color} flex items-center justify-center text-xs border border-white overflow-hidden`}
-                                  title={person.name}
-                                >
-                                  {person.name.charAt(0)}
-                                </div>
-                              ) : null;
-                            })}
+                    <div className={`p-2 ${isCurrentDay ? 'bg-blue-100 font-bold' : 'bg-gray-100'}`}>
+                      <div className="text-center">
+                        {viewMode === 'week' && (
+                          <div className="text-sm text-gray-500">
+                            {format(day, 'EEEE', { locale: es })}
                           </div>
                         )}
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteEvent(event.id);
-                          }}
-                          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          ✕
-                        </button>
+                        {viewMode === 'year' ? (
+                          <div className="font-medium">{format(day, 'MMMM', { locale: es })}</div>
+                        ) : (
+                          <div className="text-lg">
+                            {format(day, 'd')}
+                          </div>
+                        )}
                       </div>
-                    ))}
-                    {getEventsForDay(day).length === 0 && (
-                      <div className="text-center text-gray-400 text-sm p-2">
-                        + Añadir evento
-                      </div>
-                    )}
+                    </div>
+                    <div 
+                      className={`${
+                        viewMode === 'week' 
+                          ? 'min-h-[200px] max-h-[300px]' 
+                          : viewMode === 'month' 
+                            ? 'min-h-[100px] max-h-[150px]' 
+                            : 'min-h-0'
+                      } p-2 cursor-pointer overflow-y-auto`}
+                      onClick={() => handleDayClick(day)}
+                    >
+                      {viewMode === 'year' ? (
+                        // En vista anual, mostrar solo el número de eventos
+                        <div className="text-center">
+                          <span className="font-medium">{eventsForDay.length}</span> 
+                          <span className="text-xs text-gray-500"> eventos</span>
+                        </div>
+                      ) : (
+                        // En vista semanal o mensual, mostrar los eventos
+                        <>
+                          {eventsForDay.map(event => (
+                            <div 
+                              key={event.id} 
+                              className={`p-2 mb-2 rounded-lg ${event.color} text-white text-sm relative group`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEventClick(event);
+                              }}
+                            >
+                              <div className="font-bold">{event.title}</div>
+                              <div className="text-xs">
+                                {event.time} 
+                                {event.endTime && ` - ${event.endTime}`} 
+                                {event.platform && ` · ${event.platform}`}
+                              </div>
+                              {event.people && event.people.length > 0 && (
+                                <div className="flex -space-x-1 mt-1">
+                                  {event.people.map(personId => {
+                                    const person = people.find(p => p.id === personId);
+                                    return person ? (
+                                      <div 
+                                        key={personId}
+                                        className={`w-5 h-5 rounded-full ${person.color} flex items-center justify-center text-xs border border-white overflow-hidden`}
+                                        title={`${person.name} ${person.lastName}`}
+                                      >
+                                        {person.name.charAt(0)}{person.lastName.charAt(0)}
+                                      </div>
+                                    ) : null;
+                                  })}
+                                </div>
+                              )}
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteEvent(event.id);
+                                }}
+                                className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))}
+                          {eventsForDay.length === 0 && (
+                            <div className="text-center text-gray-400 text-xs p-2">
+                              + Añadir evento
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -564,15 +836,15 @@ export default function CalendarPage() {
                           {format(event.date, 'dd/MM/yyyy')} - {event.time} - {event.platform}
                         </div>
                         {event.people && event.people.length > 0 && (
-                          <div className="flex space-x-1 mt-1">
+                          <div className="flex flex-wrap gap-1 mt-1">
                             {event.people.map(personId => {
                               const person = people.find(p => p.id === personId);
                               return person ? (
                                 <span 
                                   key={personId}
-                                  className="text-xs text-gray-500"
+                                  className={`px-2 py-1 rounded-full text-xs ${person.color} text-white`}
                                 >
-                                  {person.name}
+                                  {person.name} {person.lastName}
                                 </span>
                               ) : null;
                             })}
@@ -587,10 +859,17 @@ export default function CalendarPage() {
                       </button>
                     </div>
                   ))}
+                
+                {/* Si no hay eventos próximos */}
+                {events.filter(event => !event.isRecurring).length === 0 && (
+                  <div className="text-center py-6 text-gray-500">
+                    No hay eventos próximos programados.
+                  </div>
+                )}
               </div>
             </div>
             
-            {/* Resumen por plataforma */}
+            {/* Resumen */}
             <div className="bg-white rounded-lg shadow-lg p-6">
               <h3 className="text-lg font-semibold mb-4">Resumen</h3>
               <div className="space-y-4">
@@ -630,8 +909,10 @@ export default function CalendarPage() {
                     return (
                       <div key={person.id} className="flex items-center justify-between p-2 border-b">
                         <div className="flex items-center">
-                          <div className={`w-3 h-3 rounded-full ${person.color} mr-2`}></div>
-                          <span>{person.name}</span>
+                          <div className={`w-5 h-5 rounded-full ${person.color} flex items-center justify-center text-xs text-white`}>
+                            {person.name.charAt(0)}{person.lastName.charAt(0)}
+                          </div>
+                          <span className="ml-2">{person.name} {person.lastName}</span>
                         </div>
                         <div className="font-semibold">{count}</div>
                       </div>
@@ -773,7 +1054,12 @@ export default function CalendarPage() {
                           onChange={() => handlePersonToggle(person.id)}
                           className="h-4 w-4"
                         />
-                        <span>{person.name}</span>
+                        <div className="flex items-center">
+                          <div className="w-5 h-5 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-xs mr-1">
+                            {person.name.charAt(0)}{person.lastName.charAt(0)}
+                          </div>
+                          <span>{person.name} {person.lastName}</span>
+                        </div>
                       </div>
                     ))}
                   </div>
